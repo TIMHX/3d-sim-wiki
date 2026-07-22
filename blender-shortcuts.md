@@ -81,6 +81,7 @@ confidence: high
 | `Ctrl` + `F` | Face menu |
 | `X` | Delete (vertex/edge/face) |
 | `Shift` + `D` | Duplicate |
+| `Shift` + `D`, then `RMB` | Duplicate in place (cancel move, keep copy) |
 | `Alt` + `D` | Linked duplicate (shared mesh data) |
 | `Shift` + `R` | Repeat last operation |
 | `Alt` + `E` | Extrude menu (individual faces, along normals) |
@@ -88,7 +89,11 @@ confidence: high
 | `Alt` + `S` | Shrink/Fatten (沿法线缩放，Edit Mode) |
 | `Alt` + `F` | Beautify faces (优化三角面布局) |
 | `Alt` + `J` | Tris to Quads |
+| `Ctrl` + `H` | Hook menu (bind vertex to empty/bone) |
 | `F9` | Adjust last operation panel |
+| `H` | Hide selected geometry |
+| `Alt` + `H` | Unhide all hidden geometry |
+| `Shift` + `H` | Hide unselected — isolate specific geometry |
 
 ## Object Mode
 
@@ -96,6 +101,7 @@ confidence: high
 |----------|--------|
 | `Shift` + `A` | Add menu (mesh, light, camera, etc.) |
 | `Shift` + `D` | Duplicate object |
+| `Shift` + `D`, then `RMB` | Duplicate in place (cancel move) |
 | `Ctrl` + `J` | Join selected objects |
 | `Ctrl` + `P` | Parent selected to active |
 | `Alt` + `P` | Clear parent (menu: keep transform / clear) |
@@ -121,6 +127,7 @@ confidence: high
 | `Shift` + `Z` | Toggle wireframe/rendered |
 | `Alt` + `Z` | Toggle X-ray |
 | `Alt` + `B` | Clipping region (render preview isolation) |
+| `D` + `LMB` drag | Annotate — freehand draw on viewport |
 | `Ctrl` + `Space` | Toggle maximize area |
 | `~` (tilde) | View pie menu |
 | `,` (comma) | View orientation pie menu |
@@ -175,6 +182,9 @@ confidence: high
 - **Numpad shortcuts work with regular number keys too** — enable "Emulate Numpad" in Preferences → Input
 - **On laptop/mac without numpad**: Preferences → Input → Emulate Numpad
 - **Middle mouse broken?** `Shift` + `Alt` + `LMB` = orbit, `Shift` + `Alt` + `Ctrl` + `LMB` = zoom
+- **Isolate geometry fast:** `Shift` + `H` (hide unselected) → work → `Alt` + `H` (unhide all) — works in both Object and Edit Mode
+- **Duplicate in place:** `Shift` + `D` then immediately `RMB` — creates a copy at the exact same location
+- **Annotate for planning:** `D` + `LMB` to sketch notes directly on the 3D viewport; `D` + `D` to erase all annotations
 
 ## See Also
 
