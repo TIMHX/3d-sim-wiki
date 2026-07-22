@@ -18,8 +18,11 @@ confidence: high
 | Shortcut | Action |
 |----------|--------|
 | `MMB` drag | Rotate view (orbit) |
+| `Alt` + `LMB` drag | Rotate view — 无中键替代方案 |
 | `Shift` + `MMB` drag | Pan view |
+| `Alt` + `Shift` + `LMB` drag | Pan view — 无中键替代 |
 | `Scroll` | Zoom in/out |
+| `Alt` + `Ctrl` + `LMB` drag | Zoom — 无滚轮替代 |
 | `Numpad 2` / `4` / `6` / `8` | Orbit down / left / right / up (15° steps) |
 | `Shift` + `~` | Fly/Walk navigation mode |
 
@@ -194,7 +197,7 @@ If your keyboard lacks a numpad, enable **Emulate Numpad** in Preferences → In
 - **`F9` after any operation** — tweak parameters (bevel segments, extrude depth, etc.)
 - **Numpad shortcuts work with regular number keys too** — enable "Emulate Numpad" in Preferences → Input
 - **On laptop/mac without numpad**: Preferences → Input → Emulate Numpad
-- **Middle mouse broken?** `Shift` + `Alt` + `LMB` = orbit, `Shift` + `Alt` + `Ctrl` + `LMB` = zoom
+- **Middle mouse broken?** See Navigation section — `Alt` + `LMB` / `Shift` + `LMB` / `Ctrl` + `LMB` combinations replace MMB/scroll entirely
 - **Isolate geometry fast:** `Shift` + `H` (hide unselected) → work → `Alt` + `H` (unhide all) — works in both Object and Edit Mode
 - **Duplicate in place:** `Shift` + `D` then immediately `RMB` — creates a copy at the exact same location
 - **Annotate for planning:** `D` + `LMB` to sketch notes directly on the 3D viewport; `D` + `D` to erase all annotations
