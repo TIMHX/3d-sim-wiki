@@ -36,7 +36,7 @@ confidence: high
 | `Ctrl` + `Numpad 0` | Set active object as camera |
 | `Ctrl` + `Alt` + `Numpad 0` | Align active camera to current view |
 | `Ctrl` + `Alt` + `Q` | Quad view (front/top/right + perspective) |
-| `Numpad .` | Frame selected |
+| `Numpad .` | Frame selected — 拉近聚焦选中物体 |
 | `Home` | Frame all objects |
 | `/` (slash) | Local view — isolate selected object |
 
