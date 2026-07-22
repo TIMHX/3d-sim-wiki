@@ -44,6 +44,10 @@ confidence: high
 | `Ctrl` + `I` | Invert selection |
 | `L` | Select linked (under cursor, in Edit Mode) |
 | `Ctrl` + `L` | Select all linked geometry |
+| `Alt` + `LMB` (on edge) | Select edge loop |
+| `Alt` + `Shift` + `LMB` | Select edge ring / multiple loops |
+| `Ctrl` + `Numpad +` | Grow selection |
+| `Ctrl` + `Numpad -` | Shrink selection |
 | `1` / `2` / `3` | Vertex / Edge / Face select mode (Edit Mode) |
 
 ## Transform (Object & Edit Mode)
@@ -79,6 +83,11 @@ confidence: high
 | `Shift` + `D` | Duplicate |
 | `Alt` + `D` | Linked duplicate (shared mesh data) |
 | `Shift` + `R` | Repeat last operation |
+| `Alt` + `E` | Extrude menu (individual faces, along normals) |
+| `Alt` + `N` | Normals menu (flip, recalculate outside/inside) |
+| `Alt` + `S` | Shrink/Fatten (沿法线缩放，Edit Mode) |
+| `Alt` + `F` | Beautify faces (优化三角面布局) |
+| `Alt` + `J` | Tris to Quads |
 | `F9` | Adjust last operation panel |
 
 ## Object Mode
@@ -89,11 +98,12 @@ confidence: high
 | `Shift` + `D` | Duplicate object |
 | `Ctrl` + `J` | Join selected objects |
 | `Ctrl` + `P` | Parent selected to active |
-| `Alt` + `P` | Clear parent |
+| `Alt` + `P` | Clear parent (menu: keep transform / clear) |
 | `H` | Hide selected |
 | `Alt` + `H` | Unhide all |
 | `Shift` + `H` | Hide unselected |
 | `Ctrl` + `M` | Mirror (opens axis menu) |
+| `Alt` + `G` / `Alt` + `R` / `Alt` + `S` | Clear location / rotation / scale |
 | `/` | Local view toggle |
 
 ## Modifiers
@@ -110,6 +120,7 @@ confidence: high
 | `Z` | Shading pie menu (wireframe, solid, material preview, rendered) |
 | `Shift` + `Z` | Toggle wireframe/rendered |
 | `Alt` + `Z` | Toggle X-ray |
+| `Alt` + `B` | Clipping region (render preview isolation) |
 | `Ctrl` + `Space` | Toggle maximize area |
 | `~` (tilde) | View pie menu |
 | `,` (comma) | View orientation pie menu |
@@ -127,6 +138,8 @@ confidence: high
 | `3` | Grab brush |
 | `Shift` smooth | Hold to smooth |
 | `Ctrl` invert | Hold to invert brush effect |
+| `Alt` + `M` | Mask menu |
+| `Alt` + `A` | Auto-masking settings popover |
 
 ## Animation / Timeline
 

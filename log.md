@@ -22,3 +22,4 @@ tags: [meta]
 - Categories: navigation, selection, transform, edit mode, object mode, sculpting, animation, viewport
 - Sources: quickref.me, BringYourOwnLaptop (BYOL)
 - Raw references saved to raw/references/
+- 2026-07-22 (update): Added Alt-key shortcuts — edge loop/ring select, extrude menu, normals, shrink/fatten, beautify faces, tris-to-quads, clipping region, mask menu
