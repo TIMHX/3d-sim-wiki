@@ -14,6 +14,8 @@ tags: [meta]
 
 ## Entities
 
+- [[blender-shortcuts|Blender Keyboard Shortcuts]] — Complete hotkey reference: navigation, selection, modeling, sculpting, viewport
+
 ## Concepts
 
 ## Comparisons

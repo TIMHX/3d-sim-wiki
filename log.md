@@ -16,3 +16,9 @@ tags: [meta]
 - Domain: 3D graphics, simulation, VR/AR, robotics environments
 - Covering: Blender, Isaac Lab/Sim, Gaussian Splatting, Unity, VRChat
 - Structure created with SCHEMA.md, index.md, log.md
+
+## [2026-07-22] create | blender-shortcuts
+- Created [[blender-shortcuts|Blender Keyboard Shortcuts]] — comprehensive hotkey reference
+- Categories: navigation, selection, transform, edit mode, object mode, sculpting, animation, viewport
+- Sources: quickref.me, BringYourOwnLaptop (BYOL)
+- Raw references saved to raw/references/
