@@ -1,0 +1,1 @@
+# 3d-sim-wiki\n\nPersonal knowledge base for 3D graphics, simulation, VR/AR, and robotics environments.\n\n- Blender modeling & scene design\n- Gaussian Splatting\n- Isaac Sim / Isaac Lab\n- Unity & VRChat\n- Physics simulation\n\nBuilt with LLM wiki format (Karpathy pattern).
