@@ -20,16 +20,29 @@ confidence: high
 | `MMB` drag | Rotate view (orbit) |
 | `Shift` + `MMB` drag | Pan view |
 | `Scroll` | Zoom in/out |
-| `Numpad 1` | Front view |
-| `Numpad 3` | Right view |
-| `Numpad 7` | Top view |
+| `Numpad 2` / `4` / `6` / `8` | Orbit down / left / right / up (15° steps) |
+| `Shift` + `~` | Fly/Walk navigation mode |
+
+### View Switching (Numpad / Number Keys)
+
+| Shortcut | Action |
+|----------|--------|
+| `Numpad 1` | Front view (`Ctrl` + `1` = Back) |
+| `Numpad 3` | Right view (`Ctrl` + `3` = Left) |
+| `Numpad 7` | Top view (`Ctrl` + `7` = Bottom) |
 | `Numpad 9` | Reverse view (opposite of current) |
-| `Numpad 5` | Toggle orthographic/perspective |
+| `Numpad 5` | Toggle orthographic / perspective |
 | `Numpad 0` | Camera view |
 | `Ctrl` + `Numpad 0` | Set active object as camera |
+| `Ctrl` + `Alt` + `Numpad 0` | Align active camera to current view |
+| `Ctrl` + `Alt` + `Q` | Quad view (front/top/right + perspective) |
 | `Numpad .` | Frame selected |
 | `Home` | Frame all objects |
 | `/` (slash) | Local view — isolate selected object |
+
+### Laptop / No Numpad
+
+If your keyboard lacks a numpad, enable **Emulate Numpad** in Preferences → Input. Then the regular number row (`1`–`0`) works as Numpad. `~` (tilde) opens the **View pie menu** as an alternative to numpad views.
 
 ## Selection
 
