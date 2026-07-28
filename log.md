@@ -17,6 +17,12 @@ tags: [meta]
 - Covering: Blender, Isaac Lab/Sim, Gaussian Splatting, Unity, VRChat
 - Structure created with SCHEMA.md, index.md, log.md
 
+## [2026-07-27] create | blender-construction-site-tutorial
+- Zero-to-scene construction site for Ziwon Yoon's humanoid navigation VIP project
+- 15m×15m, 3-layer build: BaseGround → paths (shortcut + detour) → obstacles (trash cans, material stacks, rebar, scaffold, mixer)
+- Covers: Plane, Cube, Cylinder creation, Displace modifier, naming, proportional editing, Shift+D duplication, Ctrl+J merge
+- Target: complete Blender beginner, no prior experience assumed
+
 ## [2026-07-22] create | blender-shortcuts
 - Created [[blender-shortcuts|Blender Keyboard Shortcuts]] — comprehensive hotkey reference
 - Categories: navigation, selection, transform, edit mode, object mode, sculpting, animation, viewport

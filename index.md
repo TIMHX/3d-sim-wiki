@@ -15,6 +15,7 @@ tags: [meta]
 ## Entities
 
 - [[blender-shortcuts|Blender Keyboard Shortcuts]] — Complete hotkey reference: navigation, selection, modeling, sculpting, viewport
+- [[blender-construction-site-tutorial|Construction Site Tutorial]] — Zero-to-scene Blender tutorial: 15m×15m construction site with terrain, paths, obstacles
 
 ## Concepts
 
