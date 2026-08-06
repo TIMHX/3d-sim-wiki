@@ -32,3 +32,5 @@ tags: [meta]
 - 2026-07-22 (update): Added H-key shortcuts — hide/unhide in Edit Mode, isolate geometry workflow
 - 2026-07-22 (update): Added D-key shortcuts — duplicate-in-place (Shift+D+RMB), annotate tool (D+draw), erase annotations (D+D)
 - 2026-07-22 (update): Expanded Navigation + Numpad section — orbit keys (2468), all axis views (front/back/right/left/top/bottom), quad view (Ctrl+Alt+Q), align camera to view, fly/walk mode, laptop/numpad-less setup
+- 2026-08-06 (create): [[isaaclab-docker-env|IsaacLab Docker Environment (tim-pc)]] — robot project docker setup: repo @2.3.0/feature/navigation, gh auth isolation, isaac-lab-base image, daily commands, cleanup history
+- 2026-08-06 (create): [[isaaclab-operation-manual|IsaacLab Operation Manual]] — 完整操作手册(容器/GUI/Blender场景导入/navigation训练)，替代分散的本地 markdown 副本
