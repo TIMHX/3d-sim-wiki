@@ -10,7 +10,7 @@ tags: [meta]
 
 > 3D/Simulation/VR knowledge base — Blender, Isaac Lab, Gaussian Splatting, Unity, VRChat.
 > Read this first to find relevant pages for any query.
-> Last updated: 2026-08-06 | Total pages: 3
+> Last updated: 2026-08-10 | Total pages: 4
 
 ## Entities
 
@@ -21,6 +21,7 @@ tags: [meta]
 
 - [[isaaclab-docker-env|IsaacLab Docker Environment (tim-pc)]] — Robot project Isaac Lab docker setup: repo, gh auth isolation, daily commands, GPU verification
 - [[isaaclab-operation-manual|IsaacLab Operation Manual]] — 完整操作手册：容器生命周期、GUI/headless、导入 Blender 场景、navigation 训练/推理
+- [[navigation-task-design|Navigation Task 设计]] — G1 双足导航任务完整设计：场景元素、初始化流程、观测/奖励/终止、传感器配置、资产依赖
 
 ## Comparisons
 
