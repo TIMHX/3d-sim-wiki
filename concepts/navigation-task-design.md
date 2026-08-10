@@ -148,6 +148,23 @@ navigation:
 - `Enviornment_G1.py:35`: `_policy_path = "/home/zyoon6/..."` — 仅推理用，训练不影响
 - `rsl_rl_ppo_cfg.py:141`: `logger="wandb"` — 需 WANDB_MODE=disabled
 
+## 场景圆圈标记 (Start/Goal/Object)
+
+Blender 场景中有三个 Empty 类型的圆圈标记，命名规范为 `Start`、`Goal`、`Object`。Empty 类型不导出到 USD——位置通过 `extract_blender_markers.py` 提取到 `scene_markers.json`，手动填入代码：
+
+| 代码位置 | 读取来源 |
+|----------|---------|
+| `event_cfg.py:83` `reset_base.pose_range` | `scene_markers.json → Start.position` |
+| `scene_cfg.py:314` `object.init_state.pos` | `scene_markers.json → Object.position` |
+| Goal | 由 `NavigationCommandsCfg` velocity commands 动态定义 |
+
+提取命令：
+```bash
+/snap/bin/blender <scene>.blend --background --python extract_blender_markers.py
+```
+
+Park 当前坐标：Start `(-0.75, -13.82)`, Goal `(0.75, 0.19)`, Object `(-0.17, -6.19)`
+
 ## 相关问题与排查
 
 ### 环境创建卡住
