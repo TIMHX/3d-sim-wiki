@@ -34,3 +34,17 @@ tags: [meta]
 - 2026-07-22 (update): Expanded Navigation + Numpad section — orbit keys (2468), all axis views (front/back/right/left/top/bottom), quad view (Ctrl+Alt+Q), align camera to view, fly/walk mode, laptop/numpad-less setup
 - 2026-08-06 (create): [[isaaclab-docker-env|IsaacLab Docker Environment (tim-pc)]] — robot project docker setup: repo @2.3.0/feature/navigation, gh auth isolation, isaac-lab-base image, daily commands, cleanup history
 - 2026-08-06 (create): [[isaaclab-operation-manual|IsaacLab Operation Manual]] — 完整操作手册(容器/GUI/Blender场景导入/navigation训练)，替代分散的本地 markdown 副本
+
+## [2026-08-16] create | Isaac env pipeline pages (first-hand, 5 pages)
+
+- concepts/[[isaac-env-export-pipeline]] — 两步导出管线(宿主 Blender + 容器 authoring)，profile 解析与盖章
+- concepts/[[blender-isaac-env-structure]] — 两层扁平层级、命名与集合约定
+- concepts/[[isaac-ground-split]] — 地面按材质拆分方法与不穿模分区不变量
+- concepts/[[isaac-friction-profiles]] — PMAT__muXXX 公式与碰撞近似
+- [[blender-usd-subdiv-render-levels]] — 渲染级细分评估的坑(874M vs 237M 诊断)
+- 来源:OpenViking 回忆机器人项目 Park/Construction 环境的完整实践(2026-08-15~16)
+
+## [2026-08-16] update | isaaclab-operation-manual + index merge
+
+- 刷新操作手册场景状态表:Park/Construction 的 simulation.usda 已于 2026-08-16 重新生成(原记录为"缺 simulation.usda")
+- 新页面按 repo 惯例归入 concepts/(troubleshooting 页留在根),index 合并为 10 页

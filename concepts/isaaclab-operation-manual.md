@@ -1,7 +1,7 @@
 ---
 title: IsaacLab Operation Manual
 created: 2026-08-06
-updated: 2026-08-06
+updated: 2026-08-16
 type: concept
 tags: [isaac-lab, robot-env, workflow, troubleshooting]
 confidence: high
@@ -80,13 +80,13 @@ isaaclab -p scripts/reinforcement_learning/rsl_rl/train.py --task navigation_Z1-
 
 ## 3. 导入你自己的 Blender 环境（Construction / Park）
 
-项目组在 repo 内置了完整管线：`scripts/tools/blender_isaac/`（详见其 README.md）。
+项目组在 repo 内置了完整管线：`scripts/tools/blender_isaac/`（详见其 README.md；内部机制与常见坑见 [[isaac-env-export-pipeline]]）。
 
-**你的两个场景现状**（已检查）：
+**你的两个场景现状**（2026-08-16 已重新导出）：
 | 场景 | 位置 | 状态 |
 |------|------|------|
-| Construction | `~/blender_proj/Construction/` | 有 geometry.usdc + physics_profiles.json，**缺 simulation.usda** |
-| Park | `~/blender_proj/Park/` | 有 geometry.usdc + physics_profiles.json，**缺 simulation.usda** |
+| Construction | `~/blender_proj/Construction/` | ✅ geometry.usdc + simulation.usda 均已生成（2026-08-16 重导） |
+| Park | `~/blender_proj/Park/` | ✅ geometry.usdc + simulation.usda 均已生成（2026-08-16 重导，地面按摩擦拆分） |
 
 参考模板：`~/Downloads/example_env/`（完整，含 simulation.usda，是导师给的 example）。
 

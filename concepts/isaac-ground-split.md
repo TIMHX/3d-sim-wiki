@@ -35,6 +35,10 @@ confidence: high
 
 实测:Park 1,968,128 tris = grass 1,779,648 + dirt 188,480;Construction 3,936,256 quads = concrete + tracks + drydirt。
 
+## 另一种做法:分层独立 plane
+
+[[blender-construction-site-tutorial]] 采用另一种路线:BaseGround 打底,路径/混凝土层各自是**独立的 plane 叠在不同高度**(Z=0.03 等)。不需要面级材质拆分,代价是各层间靠高度差防穿插,且每层摩擦单一。逐面多材质的地面(如 Park 的草地+泥土)则必须用本页的材质拆分法。
+
 ## 摩擦分片绑定
 
 每个 `SURF__<zone>__muXXX` 分片在 simulation.usda 里绑定对应 `PMAT__muXXX`,地面碰撞近似用 `none`(三角网格),见 [[isaac-friction-profiles]]。

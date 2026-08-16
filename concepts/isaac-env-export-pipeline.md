@@ -21,6 +21,8 @@ confidence: high
 
 环境包布局:`scene.blend` / `environment.json` / `physics_profiles.json` / `geometry.usdc` / `simulation.usda` / `simulation.usda.report.json` / `textures/`。
 
+环境搭建与容器日常操作见 [[isaaclab-docker-env]];面向用户的运行步骤(复制场景、容器内执行、接入 task)见 [[isaaclab-operation-manual]],本页记管线内部机制。
+
 ## 第一步:几何导出(宿主机,headless Blender)
 
 ```bash
