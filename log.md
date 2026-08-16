@@ -48,3 +48,9 @@ tags: [meta]
 
 - 刷新操作手册场景状态表:Park/Construction 的 simulation.usda 已于 2026-08-16 重新生成(原记录为"缺 simulation.usda")
 - 新页面按 repo 惯例归入 concepts/(troubleshooting 页留在根),index 合并为 10 页
+
+## [2026-08-16] update | 命名铁律 + 四场景重导出
+
+- [[blender-isaac-env-structure]]:新增重复对象命名铁律(`基础名.NNN__muXXX`,严禁 `__muXXX.NNN`,后者 `.001` 会漏判回落 mu080)
+- [[isaac-env-export-pipeline]]:环境规范名修正(construction_site→construction,补 park2/construction2)、补 create_environment.sh --template 与共享 profiles 6 码说明、铁律(严禁改脚本/repo static)
+- 来源:2026-08-16 四场景(park/park2/construction/construction2)`.NNN` 改名 + 零脚本改动重导出 + 打包到 packages_20260816/

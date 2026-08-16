@@ -29,6 +29,7 @@ USD 里每个物理物体必须是两层:
 - 所有物理物体名以 `__muXXX` 结尾(摩擦系数标记,如 `Wooden_Bench__mu045`)
 - 地面分区命名 `SURF__<zone>__muXXX`,直接沿用材质名(如 `SURF__grass__mu080`)
 - 标记物 Goal / Object(Obj1) / Start 是无子级的 EMPTY,位置由 `extract_markers.py` 输出到 `scene_markers.json`
+- **重复对象命名(铁律)**:同一资产多实例(托盘 ×4、木板 ×3、石头 ×2)用 `基础名.NNN__muXXX`(如 `Wooden_Pallet.001__mu045`),名字**以 `__muXXX` 结尾**。严禁 `Wooden_Pallet__mu045.001`——导出脚本正则只认 `__muXXX` 后跟 `__` 或结尾,`.001` 后缀会漏判回落 mu080。
 
 ## 集合
 

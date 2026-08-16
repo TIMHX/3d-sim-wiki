@@ -17,9 +17,11 @@ confidence: high
 |---|---|
 | 宿主(Host) | `/home/xing/robot/IsaacLab` |
 | 容器(Docker `isaac-lab-base`) | `/workspace/isaaclab`(bind mount 仅 `source`、`scripts`、`tools`、`logs`、`docs`、`data_storage`) |
-| 环境包暂存 | `scripts/tools/blender_isaac/environments/<name>/`(规范名:`park`、`construction_site`;目录名即环境 ID) |
+| 环境包暂存 | `scripts/tools/blender_isaac/environments/<name>/`(规范名:`park`、`park2`、`construction`、`construction2`;目录名即环境 ID) |
 
 环境包布局:`scene.blend` / `environment.json` / `physics_profiles.json` / `geometry.usdc` / `simulation.usda` / `simulation.usda.report.json` / `textures/`。
+
+脚手架用 `create_environment.sh <name> --template <repo>/scripts/tools/blender_isaac/scene_example.blend`(默认模板文件名是旧的 `blender_isaac_static_environment_example.blend`);共享 `physics_profiles.json` 只有 6 码(mu080/070/060/055/050/045),导出脚本 `sync_used_profiles` 自动补缺 mu035/040/065。**铁律:严禁改动导师 repo 的脚本/格式,只产 blender 场景 + zip 交付,场景命名去适配脚本,不 reverse。**
 
 环境搭建与容器日常操作见 [[isaaclab-docker-env]];面向用户的运行步骤(复制场景、容器内执行、接入 task)见 [[isaaclab-operation-manual]],本页记管线内部机制。
 
