@@ -1,5 +1,5 @@
 ---
-title: Lapwing 发色溶解 Hub（可扩展渐变换发色）
+title: Lapwing 发色溶解 Hub（坐标溶解 · 单前沿交叉 · 双头像）
 created: 2026-08-17
 updated: 2026-08-17
 type: summary
@@ -8,26 +8,50 @@ sources: []
 confidence: high
 ---
 
-# Lapwing 发色溶解 Hub（可扩展渐变换发色）
+# Lapwing 发色溶解 Hub（坐标溶解 · 单前沿交叉 · 双头像）
 
-Lapwing-min avatar 的发色切换从「瞬切」升级为「溶解消失 → 全透明瞬间换材质 → 溶解出现」的 O(N) 可扩展机制。用例见 [[lapwing-min-avatar-project|Lapwing-min Avatar Project]]，构建方法见 [[unity-mcp-avatar-introspection|Unity MCP Avatar Introspection]]。
+Lapwing-min avatar 的发色切换从「瞬切」升级为「溶解消失 → 换材质 → 溶解出现」的可扩展机制。v4 起：溶解方式从遮罩改为**坐标+线**，交叉溶解改为**单前沿镜像扫掠**，并完整移植到 **Midnight avatar**。用例见 [[lapwing-min-avatar-project|Lapwing-min Avatar Project]]，构建方法见 [[unity-mcp-avatar-introspection|Unity MCP Avatar Introspection]]。
 
 ## 为什么不用攻略的两两交叉溶解
 
 8 色两两配对需要 56 条过渡连线（O(N²)），加色不可扩展。Hub 机制把「检测变化」和「执行溶解」分层，加第 N+1 色 = 1 材质 + 1 动画 + 2 连线。
 
-## 最终架构（2026-08-17 交叉溶解版 v3.2，用户确认可用）
+## 最终架构（2026-08-17 坐标单前沿版 v4，PC+Midnight 均用户确认可用）
 
-用户要求 FadeIn/FadeOut **同时发生**（串行三段式有"半头发/无头发"的空窗期）→ 真·交叉溶解：
+### 材质溶解设置（9 个发色材质 + 阴影，共用资产）
+
+lilToon 坐标模式溶解：`_DissolveParams=(3, 1, border, 0.12)`——x=3 坐标方式、y=1 线形状、z=边界(border)、w=模糊；`_DissolvePos=(0, 0.1, 0)` 溶解向量；`_DissolveNoiseStrength=0.1`。
+
+可见条件：`dot(positionOS, normalize(_DissolvePos)) + 噪点 > border`。
+
+**边界标定（用户实测）**：
+- 完整显示：Pony `z=0`；LowPonytail `z=-0.1`（长发，0 会显示不全）
+- 完全消失：`z=0.7`
+- 噪点来自 `_DissolveNoiseMask` 贴图（`采样-0.5 × 强度`），本版本 `LIL_FEATURE_DissolveNoiseMask` 在 lil_replace_keywords.hlsl 里无条件 #define，无需材质关键字。⚠️ 当前噪点贴图槽位为空（用户删除 `Mask_Dissolve.png`，待重做；缺省采样按白 1.0 → 恒定 0.05 偏移，无噪点扰动但不报错）。
+
+### 状态机（与 v3.2 相同的三层结构）
 
 - **替身渲染器（ghost）**：`头发/HairPony_Crossfade` + `头发/LowPonytail_A_Lapwing/LowPonytail_{Back,Bangs,RibbonA}_Crossfade`（复制原网格+骨骼，默认隐藏；**渲染器组件必须 enabled，靠 GameObject inactive 隐藏**）。
-- **触发门禁（解决 AnyState 死循环）**：`Sensor_HairColor` 层（w=1）8 个常驻 Sens_N 状态各带 VRC Parameter Driver → Set HairFadeTrigger；`AnyState→Sens_N`（发色菜单=N, self=false）。**教训：AnyState 入口若用恒真 Int 条件，GM 模拟器持续重评估会在链条中途无限重触发（Swap↔Cross 闪烁、Promote 永不点亮）；触发器消费一次即消失是正解。** Play 模式下 driver 正常工作。
-- **三段流水线**（`Action_HairColor` 层，w=1）：`AnyState→Swap_N`【HairFadeTrigger + 发色菜单=N】→ `Swap_N`(2帧，仅 PPtr 换替身材质，替身仍隐藏) →exit1→ `Cross_N`(0.25s，纯溶解曲线+开关，新旧同时交叉) →exit1→ `Promote_N`(2帧，PPtr 移交真身+最终开关+**溶解复位键**，常驻)。
-- **`Hair_Cross_N` 动画自包含**：t=0 强制全向量 `_DissolveParams=(1,0,z,0)`；z 端点按用户校准 **-0.34=完全显示 / 1=完全消失**。
-- **Promote 必须带溶解复位键**：WD=off 会把上一状态最后采样值（Cross 结尾 z=1）每帧继续写进新换的材质 → 真身隐形光头。复位键 z=-0.34 与资产默认一致，同帧 PPtr 无冲突。
-- 控制器：**`Assets/动画/LapFX FT Active.controller`**（descriptor 引用的 FX，GestureManager 测试读它）；`LapwingBody FT.controller`（场景预览）与 `LapFX FT Stale.controller`（旧副本）同步。⚠️ 历史教训：改文件前先查 descriptor 指向，曾因两份同名控制器改错文件白忙一轮。
-- 控制器：**`Assets/动画/LapFX FT Active.controller`**（descriptor 引用的 FX，GestureManager 测试读的就是它）末尾 Action_HairColor 层；`LapwingBody FT.controller` 有同名预览层。⚠️ 历史教训：项目里曾同时存在两份 LapFX FT.controller（素体/Hash's_Things 下有一份），descriptor 指向 动画/ 那份——改错文件导致测试永远不生效。旧副本已改名为 `LapFX FT Stale.controller`。
-- 旧资产已删：Hair_FadeOut/FadeIn/Hair_Mat_0..7、HairHubFX.controller、发色菜单_1/2/3 孤儿参数（控制器+表达式资产均已清）。
+- **触发门禁**：`Sensor_HairColor` 层（w=1）8 个常驻 Sens_N 状态各带 VRC Parameter Driver → Set HairFadeTrigger；`AnyState→Sens_N`（发色菜单=N, self=false）。触发器消费一次即消失。
+- **三段流水线**（`Action_HairColor` 层，w=1，默认态 Promote_0）：`AnyState→Swap_N`【HairFadeTrigger + 发色菜单=N】→ `Swap_N`(2帧，仅 PPtr 换替身材质) →exit1→ `Cross_N`(**0.4s**，单前沿交叉) →exit1→ `Promote_N`(2帧，PPtr 移交真身+最终开关+溶解复位，常驻)。
+- 所有状态 WD=off；Promote 必须带溶解复位键（真身复位到 完整值，否则 WD 残留把新材质写隐形）。
+
+### 单前沿交叉（v4 关键设计）
+
+v3.2 的「新旧同时反向交叉」产生**两股白色边缘**（旧发 0→0.7 边缘上移 + 新发 0.7→0 边缘下移）。v4 改为替身**方向翻转 + 边界镜像**，新旧边缘完全重合，一条前沿从下往上扫：
+
+| 绑定 | 曲线 |
+|---|---|
+| 真身（旧发） | z：Pony `0→0.7`，LowPony `-0.1→0.7` |
+| 替身（新发） | `_DissolvePos.y=-0.1`（动画绑定，仅替身路径）；z：Pony `0→-0.7`，LowPony `0.1→-0.7` |
+
+镜像原理：替身可见条件变为 `y < -border`，其前沿 `-border` 与真身前沿 `border` 始终相等。Promote 无需复位 `_DissolvePos`（绑定只在替身路径上，PPtr 移交后真身材质默认向量不受影响）。
+
+### 动画资产（Assets/动画/HairDissolve/Clips/）
+
+- `Hair_Swap_N`（8）：2 帧 PPtr 换替身材质（无溶解曲线）
+- `Hair_Cross_N`（8）：0.4s；真身 4 渲染器 x=3/y=1/w=0.12 + z 扫掠；替身 z 镜像扫掠 + `_DissolvePos.y=-0.1` + m_IsActive(1→0)
+- `Hair_Promote_N`（8）：2 帧；PPtr 移交 + m_IsActive + 复位键（x=3/y=1/w=0.12/z=完整值；Pony=0, LowPony=-0.1）
 
 ## 颜色映射（发色菜单 Int → 发型/材质）
 
@@ -42,42 +66,37 @@ Lapwing-min avatar 的发色切换从「瞬切」升级为「溶解消失 → �
 | 6 | LowPony | Lap_Hair | LowPonytail_09 |
 | 7 | LowPony | Lap_Hair | LowPonytail_08 |
 
-渲染器路径（相对 avatar 根）：`头发/HairPony`（槽0 发色 + 槽1 Lap_Shadow）、`头发/LowPonytail_A_Lapwing/LowPonytail_{Back,Bangs,RibbonA,RibbonB}`（槽0 发色；Bangs 槽1 = FakeShadow，无溶解属性，改用 `_Color.a` 淡出）。注意 `Lap_Shadow` 同时被 Body 槽2 引用——动画按渲染器路径绑定，只影响 HairPony 实例，不影响身体。
+Midnight 菜单只暴露 1~7（Black/White/Gold_Low/Brown_Low/Beige_Low/Black_Low/White_Low），映射与 PC 相同。
 
-## 资产（Assets/动画/HairDissolve/）
+## Midnight 移植（2026-08-17，用户确认成功）
 
-- `Mask_Dissolve.png` — 共享溶解遮罩（256² 垂直渐变 0.02→1 + 噪声，自下而上溶解），程序生成
-- `Clips/Hair_FadeOut.anim` / `Hair_FadeIn.anim` — 溶解 `_DissolveParams.z` 0→1 / 1→0（0.25s，**最终版 4 个绑定**：HairPony 槽0 + LowPonytail Back/Bangs/RibbonA 槽0。RibbonB 已移除（场景非激活）；两个槽1 阴影材质（Lap_Shadow/FakeShadow）不参与溶解——Animation 窗口无法显示槽1 的材质数组绑定，且阴影短暂残留视觉可接受）
-- `Clips/Hair_Mat_0..7.anim` — 2 帧：`m_IsActive` 网格开关 + `m_Materials.Array.data[0]` PPtr 材质槽（无 RibbonB）
-- `HairHubFX.controller` — 见下
+Midnight 与 PC 共用全部头发材质（同 GUID）且头发模型一致 → 24 个 clip 直接复用，标定通用。移植内容：
 
-材质：9 个发色/阴影材质启用 `LIL_FEATURE_DISSOLVE` + `LIL_FEATURE_DissolveMask`，`_DissolveParams=(1,0,0,0.12)`（mode=1 遮罩、b=阈值、a=柔和）。lilToon 语义：`mask值 > b 可见`，b 从 0→1 即溶解消失；关键字门槛在 `lil_common_frag_alpha.hlsl`（`LIL_FEATURE_DISSOLVE`）与 `lil_common_frag.hlsl`（`LIL_FEATURE_DissolveMask`）。
-
-## 控制器结构（MA MergeAnimator → FX，挂在 `头发` 组上）
-
-- 参数：`发色菜单`(Int，同步，菜单不变)、`HairFadeTrigger`(Trigger，本地，**不进 Expression Parameters**)
-- `Sensor_HairColor`（weight 1）：默认 `SensorIdle`(空)；`Sens_0..7` 空状态各带 VRC Avatar Parameter Driver → Set HairFadeTrigger；`Any State → Sens_N` 条件 `发色菜单 Equals N`，**CanTransitionToSelf 关**，duration 0
-- `Action_HairColor`（weight 1）：`Idle`(默认) ← `FadeIn` ← `Mat_0..7` ← `FadeOut`；`Any State → FadeOut` 条件 HairFadeTrigger（自转关）；`FadeOut → Mat_N` 条件发色菜单=N 且 **Exit Time 1.0**（全透明才换）；`Mat_N → FadeIn`、`FadeIn → Idle` 均 Exit Time 1.0
-- **所有状态 WD=off**（关键：否则 Mat_N 单帧会把 dissolve 重置回 0，换材质瞬间露馅）
-
-旧系统拆除：LapFX FT.controller 删除 发色菜单/发色菜单_Local/发色菜单_Remote 三层（Local/Remote 原本 weight=0 是死代码）；删除 7 个 MA MaterialSwap 组件（**保留同 GO 的 MenuItem**，它负责设参数）；Android/Midnight avatars 未动（不同材质体系，Quest 用 VRCQuestToolsOutput 材质）。
+- **4 个替身渲染器**：场景内新建 `*_Crossfade`（克隆网格 `Instantiate(sharedMesh)`、共享 bones/rootBone、材质取源数组前 N 个、渲染器设置镜像 PC 替身；GO inactive）
+- **`Assets/动画/Midnight/LapFX FT Midnight.controller`**（descriptor FX）：+HairFadeTrigger 参数、克隆 Sensor_HairColor(9 态)+Action_HairColor(24 态) 两层（状态/过渡/条件/VRC Parameter Driver 行为全部程序化克隆自 LapFX FT Active，WD=off、exit-time 链条逐项验证）
+- **`Assets/动画/Midnight/Lapwing Midnight.controller`**（场景预览 Animator 用）：同步两层
+- **`.../Midnight/Midnight.asset`**：发色菜单 default 7→0
+- **Midnight TraceAndOptimize.removeUnusedObjects=False**（防 AAO 剥离默认隐藏的替身；场景 YAML 字段名即 `removeUnusedObjects`，Unity 属性反射需 NonPublic）
+- 用户已自行清理：旧 `发色菜单_Local/Remote` 层、位编码 `发色菜单_1/2/3` 参数；MA MenuItem 菜单（Hair Color 7 项）保留
+- 未动：Android 两头像（Quest 材质体系）、瞳色菜单、衣服菜单、摸头
 
 ## 已知行为与坑（实现时踩过）
 
-- **lilToon 渲染模式门槛**：`Hidden/lilToonOutline` 是不透明变体（UsePass → ltspass_opaque，LIL_RENDER=0），溶解代码被编译排除。发色材质必须用 `Hidden/lilToonCutoutOutline`（镂空+描边，LIL_RENDER=1），并保留 `LIL_FEATURE_DISSOLVE` + `LIL_FEATURE_DissolveMask` 关键字（换 shader 后关键字会重置，需重挂）。
-- **表达式参数默认值残留**：`发色菜单` 在参数资产里默认=7（旧位编码 `发色菜单_1/2/3` 默认 1,1,1 的产物），需改为 0；位编码参数随旧层退役后应从资产中删除（省 3 同步槽）。
-- **AAO 移除未使用对象 vs MA 合并源**：激活动画若只存在于 MA MergeAnimator 源里，AAO 的 removeUnusedObjects 分析（在 MA 合并前运行）看不到 → 默认隐藏的 LowPonytail 整组被当死物体删除。修复：PC 头像关掉 TraceAndOptimize.removeUnusedObjects；同时给每个头发渲染器加常驻 m_IsActive 关键帧防止 mesh 合并。
-- **孤儿过渡（历史残留）**：4 个 LapFX 控制器各含 335 条 `m_DstState` 指向已删除状态的过渡（原作者工具残留，运行时无害）。它们会让遍历过渡的编辑器工具（Play 模式模拟/处理）中断 → **PC 头像 Play 模式 Animator 控制器变 null → 全部动画失效**。已用脚本清理（递归扫描 states+anyState+嵌套子状态机，移除 null 目标过渡）。
-- **0 帧动画采样问题**：衣服/摸头动画（Default/Jacket/Demon/Cape 等）是 0 长度或单帧 clip，经 duration=0 的 AnyState 转换进入状态时，部分时序下首帧不被采样 → 状态机切换了但属性未写入，视觉延迟到下一次交互（症状：点换衣无效，换一次发色后衣服才变）。修复：所有相关 clip 补齐 2 帧（t=0 和 t=1/60 同值）。
-- **脚本创建的材质属性绑定在 Animation 窗口显示 (缺失！)**：用脚本按路径字符串写入的绑定（`m_Materials.Array.data[0]._DissolveParams.z`），窗口在无法解析（未选中正确根物体/控制器不含该 clip）时显示"缺失"。不影响运行时；手动重录方法：选中 avatar 根 → 临时挂引用该 clip 的控制器（如 HairHubFX.controller）到场景 Animator → 动画窗口 Add Property 重新加材质属性（窗口写为 `材质._DissolveParams.z`，与脚本路径运行时等价）。重录绑定清单：FadeOut/FadeIn 各 7 组（HairPony 槽0+槽1、LowPonytail Back/Bangs/RibbonA/RibbonB 槽0 溶解 + Bangs 槽1 FakeShadow `_Color.a`），0.25s、t=0/t=0.25 两关键帧。
-- **AnimatorControllerLayer 是 struct**：`ctrl.layers[i].name = x` 改的是副本，必须 `var l = ctrl.layers; l[i].x=...; ctrl.layers = l;`。`CreateAnimatorControllerAtPath` 自带 "Base Layer" 层。
-- 出生时 Sensor 默认态触发一次 → 出生自带一次发色渐入（当作生成特效）
+- **lilToon 渲染模式门槛**：`Hidden/lilToonOutline` 是不透明变体，溶解代码被编译排除。发色材质必须用 `Hidden/lilToonCutoutOutline`（LIL_RENDER=1）。
+- **表达式参数默认值残留**：`发色菜单` 曾默认=7（旧位编码 1,1,1 产物），需改为 0；位编码参数随旧层退役后从资产删除（省 3 同步槽）。Midnight 同样处理过。
+- **AAO 移除未使用对象 vs MA 合并源**：激活动画若只存在于 MA MergeAnimator 源里，AAO 的 removeUnusedObjects 分析看不到 → 默认隐藏的 LowPonytail 整组被当死物体删除。修复：PC+Midnight 头像关掉 TraceAndOptimize.removeUnusedObjects；同时每个头发渲染器有常驻 m_IsActive 关键帧防止 mesh 合并。
+- **孤儿过渡（历史残留）**：旧 LapFX 控制器各含 335 条 `m_DstState` 指向已删除状态的过渡，会让遍历过渡的编辑器工具在 Play 模式中断（Animator 控制器变 null）。PC 已清理；Midnight 移植时扫描为 0（用户清理时已顺带解决）。
+- **0 帧动画采样问题**：衣服/摸头等单帧 clip 经 duration=0 的 AnyState 转换进入状态时，首帧可能不被采样。修复：所有相关 clip 补齐 2 帧（t=0 和 t=1/60 同值）。
+- **脚本创建的材质属性绑定在 Animation 窗口显示 (缺失！)**：不影响运行时。手动重录方法见旧版本记录。
+- **AnimatorControllerLayer 是 struct**：`ctrl.layers[i].x = ...` 改的是副本，必须 `var l = ctrl.layers; l[i].x=...; ctrl.layers = l;`。
+- **状态机克隆（移植 Midnight 时）**：AnimatorController 无层拷贝 API，需程序化克隆状态/过渡/条件/行为；StateMachineBehaviour 的 List 字段要 MemberwiseClone 深拷贝，否则两控制器共享引用。
+- **出生时 Sensor 默认态触发一次** → 出生自带一次发色渐入（当作生成特效）
 - 快速连续换色：trigger 残留导致透明期变长，但每次交换重读最新发色菜单值，落点正确
-- 未验证项：VRC Parameter Driver 对 Trigger 参数的支持、实际游戏内溶解视觉效果（需上传 VRChat 实测）
+- 未验证项：实际游戏内溶解视觉效果（需上传 VRChat 实测）
 
 ## 回档
 
-git 分支 `hair-dissolve-hub`，基线 `2fa2e05a`（main）。关键检查点：`a8e26dbf`（首版）、`115d41b5`（cutout/默认值/AAO 修复）、`386d6c64`（孤儿过渡清理 + Hub 并入 LapFX FT）。全部回滚：`git checkout main` 或 `git reset --hard 2fa2e05a`（先关 Unity）。
+git 分支 `hair-dissolve-hub`，基线 `2fa2e05a`（main）。关键检查点：`a8e26dbf`（首版）→ `115d41b5`（cutout/默认值/AAO）→ `386d6c64`（孤儿过渡+Hub 并入）→ `9b94d690`（坐标模式 z 规则+x/y/w）→ `a0ef883c`（单前沿镜像 0.4s）→ `6e22eab7`（Midnight 移植）→ `0a764338`（测试后场景存档）。全部回滚：`git checkout main` 或 `git reset --hard 2fa2e05a`（先关 Unity）。
 
 ## Related
 

@@ -67,3 +67,9 @@ tags: [meta]
 - concepts/[[lapwing-hair-dissolve-hub]] — 发色溶解 Hub 完整实现记录:8 色映射表、lilToon `_DissolveParams.z` 溶解语义与关键字门槛、Sensor/Action 控制器结构、AnimatorControllerLayer struct 坑、WD=off 必要性、验证结果(9 次 NDMF 处理零 MA 错误)、git 回档点
 - 来源:2026-08-16~17 通过 Unity MCP 全流程实现(材质/动画/控制器/MA 装配/NDMF 克隆体验证)
 - index 总页数 12 → 13
+
+## [2026-08-17] update | lapwing-hair-dissolve-hub
+- v4 rewrite: coordinate/line dissolve (_DissolveParams=(3,1,border,0.12), 完整 Pony=0 / LowPony=-0.1, 消失=0.7)
+- Single-front mirrored ghost sweep: ghost _DissolvePos.y=-0.1 + mirrored border; cross duration 0.25s→0.4s
+- Midnight avatar full port (ghosts ×4, LapFX FT Midnight controller 2 layers cloned, params default 0, AAO removeUnusedObjects off) — user verified
+- Noise texture slot currently empty (user deleted Mask_Dissolve.png, TBD)
