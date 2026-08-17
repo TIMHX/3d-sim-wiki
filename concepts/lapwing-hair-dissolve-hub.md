@@ -16,6 +16,10 @@ Lapwing-min avatar 的发色切换从「瞬切」升级为「溶解消失 → �
 
 8 色两两配对需要 56 条过渡连线（O(N²)），加色不可扩展。Hub 机制把「检测变化」和「执行溶解」分层，加第 N+1 色 = 1 材质 + 1 动画 + 2 连线。
 
+## 最终架构（2026-08-17 修正版）
+
+**Hub 两层直接追加在 `LapFX FT.controller`（descriptor 引用的 FX）末尾**，不再用 MA MergeAnimator 中转。原因：GestureManager 等 Play 模式模拟器只装配 descriptor 直接引用的控制器，MA 合并源在模拟器中不可见 → 测试永远看不到 Hub；直接并入后模拟器与真实构建一致。`HairHubFX.controller` 资产保留作参考（已无引用）。
+
 ## 颜色映射（发色菜单 Int → 发型/材质）
 
 | 值 | 发型 | HairPony 槽0 | LowPonytail ×4 槽0 |
@@ -51,15 +55,18 @@ Lapwing-min avatar 的发色切换从「瞬切」升级为「溶解消失 → �
 
 ## 已知行为与坑（实现时踩过）
 
+- **lilToon 渲染模式门槛**：`Hidden/lilToonOutline` 是不透明变体（UsePass → ltspass_opaque，LIL_RENDER=0），溶解代码被编译排除。发色材质必须用 `Hidden/lilToonCutoutOutline`（镂空+描边，LIL_RENDER=1），并保留 `LIL_FEATURE_DISSOLVE` + `LIL_FEATURE_DissolveMask` 关键字（换 shader 后关键字会重置，需重挂）。
+- **表达式参数默认值残留**：`发色菜单` 在参数资产里默认=7（旧位编码 `发色菜单_1/2/3` 默认 1,1,1 的产物），需改为 0；位编码参数随旧层退役后应从资产中删除（省 3 同步槽）。
+- **AAO 移除未使用对象 vs MA 合并源**：激活动画若只存在于 MA MergeAnimator 源里，AAO 的 removeUnusedObjects 分析（在 MA 合并前运行）看不到 → 默认隐藏的 LowPonytail 整组被当死物体删除。修复：PC 头像关掉 TraceAndOptimize.removeUnusedObjects；同时给每个头发渲染器加常驻 m_IsActive 关键帧防止 mesh 合并。
+- **孤儿过渡（历史残留）**：4 个 LapFX 控制器各含 335 条 `m_DstState` 指向已删除状态的过渡（原作者工具残留，运行时无害）。它们会让遍历过渡的编辑器工具（Play 模式模拟/处理）中断 → **PC 头像 Play 模式 Animator 控制器变 null → 全部动画失效**。已用脚本清理（递归扫描 states+anyState+嵌套子状态机，移除 null 目标过渡）。
 - **AnimatorControllerLayer 是 struct**：`ctrl.layers[i].name = x` 改的是副本，必须 `var l = ctrl.layers; l[i].x=...; ctrl.layers = l;`。`CreateAnimatorControllerAtPath` 自带 "Base Layer" 层。
 - 出生时 Sensor 默认态触发一次 → 出生自带一次发色渐入（当作生成特效）
 - 快速连续换色：trigger 残留导致透明期变长，但每次交换重读最新发色菜单值，落点正确
-- 悬空 PPtr 警告（LapFX 内 2 处 fileID）与 Thry `IsLocal` 条件警告为**改动前已存在**
-- 未验证项：VRC Parameter Driver 对 Trigger 参数的支持、实际游戏内溶解视觉效果（需 Play 模式/VRChat 实测）
+- 未验证项：VRC Parameter Driver 对 Trigger 参数的支持、实际游戏内溶解视觉效果（需上传 VRChat 实测）
 
 ## 回档
 
-git 分支 `hair-dissolve-hub`，基线 `2fa2e05a`（main）。全部回滚：`git checkout main` 或 `git reset --hard 2fa2e05a`（先关 Unity）。
+git 分支 `hair-dissolve-hub`，基线 `2fa2e05a`（main）。关键检查点：`a8e26dbf`（首版）、`115d41b5`（cutout/默认值/AAO 修复）、`386d6c64`（孤儿过渡清理 + Hub 并入 LapFX FT）。全部回滚：`git checkout main` 或 `git reset --hard 2fa2e05a`（先关 Unity）。
 
 ## Related
 
