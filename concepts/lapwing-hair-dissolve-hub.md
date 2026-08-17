@@ -16,9 +16,15 @@ Lapwing-min avatar 的发色切换从「瞬切」升级为「溶解消失 → �
 
 8 色两两配对需要 56 条过渡连线（O(N²)），加色不可扩展。Hub 机制把「检测变化」和「执行溶解」分层，加第 N+1 色 = 1 材质 + 1 动画 + 2 连线。
 
-## 最终架构（2026-08-17 修正版）
+## 最终架构（2026-08-17 交叉溶解版 v3）
 
-**Hub 两层直接追加在 `LapFX FT.controller`（descriptor 引用的 FX）末尾**，不再用 MA MergeAnimator 中转。原因：GestureManager 等 Play 模式模拟器只装配 descriptor 直接引用的控制器，MA 合并源在模拟器中不可见 → 测试永远看不到 Hub；直接并入后模拟器与真实构建一致。`HairHubFX.controller` 资产保留作参考（已无引用）。
+用户要求 FadeIn/FadeOut **同时发生**（串行三段式有"半头发/无头发"的空窗期）→ 改为**真·交叉溶解**：
+
+- **替身渲染器（ghost）**：`头发/HairPony_Crossfade` + `头发/LowPonytail_A_Lapwing/LowPonytail_{Back,Bangs,RibbonA}_Crossfade`（复制原网格+骨骼，默认隐藏）。换色时新色先加载到替身（全透明），替身渐入的同时旧真身渐出，最后真身接棒、替身隐藏——同发型换色和跨发型换色统一处理。
+- **`Hair_Cross_0..7.anim`**（0.25s，不循环）：所有真身溶解 0→1；目标发型的替身 1→0；结尾帧 PPtr 移交材质给真身 + m_IsActive 交接 + 目标真身溶解复位 0。
+- **状态机极简**：每色常驻状态 `Color_0..7`（WD=off，motion=Hair_Cross_N）+ `AnyState → Color_N`（发色菜单=N，self=false，dur=0）。**无 Sensor 层、无 Trigger、无 Parameter Driver**。
+- 控制器：`LapFX FT.controller` 末尾 Action_HairColor 层（**重点**——用户测试只用 Play+GestureManager，只读 descriptor 引用的控制器）；`LapwingBody FT.controller` 有同名预览层。
+- 旧资产已删：Hair_FadeOut/FadeIn/Hair_Mat_0..7、HairHubFX.controller、发色菜单_1/2/3 孤儿参数（控制器+表达式资产均已清）。
 
 ## 颜色映射（发色菜单 Int → 发型/材质）
 
