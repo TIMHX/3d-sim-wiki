@@ -10,7 +10,7 @@ tags: [meta]
 
 > 3D/Simulation/VR knowledge base — Blender, Isaac Lab, Gaussian Splatting, Unity, VRChat.
 > Read this first to find relevant pages for any query.
-> Last updated: 2026-08-16 | Total pages: 12
+> Last updated: 2026-08-17 | Total pages: 13
 
 ## Entities
 
@@ -31,6 +31,7 @@ tags: [meta]
 ## Projects
 
 - [[lapwing-min-avatar-project|Lapwing-min Avatar Project (VRChat)]] — Lapwing avatar 项目完整结构:4 avatars、playable layers、OSCm 表情追踪 FX、MA 菜单/参数、部件与资产目录
+- [[lapwing-hair-dissolve-hub|Lapwing 发色溶解 Hub]] — O(N) 可扩展渐变换发色:颜色映射、lilToon 溶解配置、Sensor/Action 双控制器、WD/struct 等踩坑记录
 
 ## Comparisons
 

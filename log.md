@@ -1,7 +1,7 @@
 ---
 title: Wiki Log
 created: 2026-07-22
-updated: 2026-08-16
+updated: 2026-08-17
 type: meta
 tags: [meta]
 ---
@@ -61,3 +61,9 @@ tags: [meta]
 - concepts/[[unity-mcp-avatar-introspection]] — Unity MCP 探查 VRChat 项目的工作流:assets-find/animator-get-data 大结果 grep 处理、script-execute 反射模式(SDK 3.8 descriptor 图层是字段不是属性)、MA/VRCFury 组件枚举、MA 项目判读要点
 - 来源:2026-08-16 通过 Unity MCP 对 E:\ALCOM_save\Lapwing-min 的完整探查(asset 检索 + 控制器解析 + 场景反射)
 - index 新增 Projects 分类,总页数 10 → 12
+
+## [2026-08-17] create | lapwing-hair-dissolve-hub (first-hand, 1 page)
+
+- concepts/[[lapwing-hair-dissolve-hub]] — 发色溶解 Hub 完整实现记录:8 色映射表、lilToon `_DissolveParams.z` 溶解语义与关键字门槛、Sensor/Action 控制器结构、AnimatorControllerLayer struct 坑、WD=off 必要性、验证结果(9 次 NDMF 处理零 MA 错误)、git 回档点
+- 来源:2026-08-16~17 通过 Unity MCP 全流程实现(材质/动画/控制器/MA 装配/NDMF 克隆体验证)
+- index 总页数 12 → 13
