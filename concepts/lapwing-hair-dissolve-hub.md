@@ -59,6 +59,8 @@ Lapwing-min avatar 的发色切换从「瞬切」升级为「溶解消失 → �
 - **表达式参数默认值残留**：`发色菜单` 在参数资产里默认=7（旧位编码 `发色菜单_1/2/3` 默认 1,1,1 的产物），需改为 0；位编码参数随旧层退役后应从资产中删除（省 3 同步槽）。
 - **AAO 移除未使用对象 vs MA 合并源**：激活动画若只存在于 MA MergeAnimator 源里，AAO 的 removeUnusedObjects 分析（在 MA 合并前运行）看不到 → 默认隐藏的 LowPonytail 整组被当死物体删除。修复：PC 头像关掉 TraceAndOptimize.removeUnusedObjects；同时给每个头发渲染器加常驻 m_IsActive 关键帧防止 mesh 合并。
 - **孤儿过渡（历史残留）**：4 个 LapFX 控制器各含 335 条 `m_DstState` 指向已删除状态的过渡（原作者工具残留，运行时无害）。它们会让遍历过渡的编辑器工具（Play 模式模拟/处理）中断 → **PC 头像 Play 模式 Animator 控制器变 null → 全部动画失效**。已用脚本清理（递归扫描 states+anyState+嵌套子状态机，移除 null 目标过渡）。
+- **0 帧动画采样问题**：衣服/摸头动画（Default/Jacket/Demon/Cape 等）是 0 长度或单帧 clip，经 duration=0 的 AnyState 转换进入状态时，部分时序下首帧不被采样 → 状态机切换了但属性未写入，视觉延迟到下一次交互（症状：点换衣无效，换一次发色后衣服才变）。修复：所有相关 clip 补齐 2 帧（t=0 和 t=1/60 同值）。
+- **脚本创建的材质属性绑定在 Animation 窗口显示 (缺失！)**：用脚本按路径字符串写入的绑定（`m_Materials.Array.data[0]._DissolveParams.z`），窗口在无法解析（未选中正确根物体/控制器不含该 clip）时显示"缺失"。不影响运行时；手动重录方法：选中 avatar 根 → 临时挂引用该 clip 的控制器（如 HairHubFX.controller）到场景 Animator → 动画窗口 Add Property 重新加材质属性（窗口写为 `材质._DissolveParams.z`，与脚本路径运行时等价）。重录绑定清单：FadeOut/FadeIn 各 7 组（HairPony 槽0+槽1、LowPonytail Back/Bangs/RibbonA/RibbonB 槽0 溶解 + Bangs 槽1 FakeShadow `_Color.a`），0.25s、t=0/t=0.25 两关键帧。
 - **AnimatorControllerLayer 是 struct**：`ctrl.layers[i].name = x` 改的是副本，必须 `var l = ctrl.layers; l[i].x=...; ctrl.layers = l;`。`CreateAnimatorControllerAtPath` 自带 "Base Layer" 层。
 - 出生时 Sensor 默认态触发一次 → 出生自带一次发色渐入（当作生成特效）
 - 快速连续换色：trigger 残留导致透明期变长，但每次交换重读最新发色菜单值，落点正确
