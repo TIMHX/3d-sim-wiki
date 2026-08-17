@@ -73,3 +73,8 @@ tags: [meta]
 - Single-front mirrored ghost sweep: ghost _DissolvePos.y=-0.1 + mirrored border; cross duration 0.25s→0.4s
 - Midnight avatar full port (ghosts ×4, LapFX FT Midnight controller 2 layers cloned, params default 0, AAO removeUnusedObjects off) — user verified
 - Noise texture slot currently empty (user deleted Mask_Dissolve.png, TBD)
+
+## [2026-08-17] create | lapwing-clothes-dissolve-analysis
+- Can the hair dissolve hub generalize to clothing? Material-only = O(n) direct port
+- Different-mesh outfits: per-pair naive = O(n²); single-front mirror imposes pairwise constraints → per-outfit calibration also O(n²) in effect quality
+- Escape hatch: one global unified sweep range + ONE shared Cross clip → O(1) calibration, O(1) per new outfit, O(n+m) total; trade-offs documented
