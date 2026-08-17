@@ -10,7 +10,7 @@ tags: [meta]
 
 > 3D/Simulation/VR knowledge base — Blender, Isaac Lab, Gaussian Splatting, Unity, VRChat.
 > Read this first to find relevant pages for any query.
-> Last updated: 2026-08-16 | Total pages: 10
+> Last updated: 2026-08-16 | Total pages: 12
 
 ## Entities
 
@@ -26,6 +26,11 @@ tags: [meta]
 - [[blender-isaac-env-structure]] — 场景结构约定:两层扁平层级、`__muXXX` 命名、集合
 - [[isaac-ground-split]] — 地面按材质拆分:烘焙评估几何 → separate by material,不穿模分区不变量
 - [[isaac-friction-profiles]] — PMAT__muXXX 摩擦材质:公式、解析链、碰撞近似
+- [[unity-mcp-avatar-introspection|Unity MCP Avatar Introspection]] — 用 Unity MCP 摸清 VRChat 项目结构的工作流:工具选择、反射 API 坑、MA 判读要点
+
+## Projects
+
+- [[lapwing-min-avatar-project|Lapwing-min Avatar Project (VRChat)]] — Lapwing avatar 项目完整结构:4 avatars、playable layers、OSCm 表情追踪 FX、MA 菜单/参数、部件与资产目录
 
 ## Comparisons
 

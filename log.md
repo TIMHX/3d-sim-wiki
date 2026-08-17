@@ -1,7 +1,7 @@
 ---
 title: Wiki Log
 created: 2026-07-22
-updated: 2026-07-22
+updated: 2026-08-16
 type: meta
 tags: [meta]
 ---
@@ -54,3 +54,10 @@ tags: [meta]
 - [[blender-isaac-env-structure]]:新增重复对象命名铁律(`基础名.NNN__muXXX`,严禁 `__muXXX.NNN`,后者 `.001` 会漏判回落 mu080)
 - [[isaac-env-export-pipeline]]:环境规范名修正(construction_site→construction,补 park2/construction2)、补 create_environment.sh --template 与共享 profiles 6 码说明、铁律(严禁改脚本/repo static)
 - 来源:2026-08-16 四场景(park/park2/construction/construction2)`.NNN` 改名 + 零脚本改动重导出 + 打包到 packages_20260816/
+
+## [2026-08-16] create | Lapwing-min VRChat avatar project pages (first-hand, 2 pages)
+
+- concepts/[[lapwing-min-avatar-project]] — Lapwing-min 项目完整结构:4 avatars(PC/Quest × 标准/Midnight)、playable layers 装配、OSCm/FT 表情追踪 FX 层(40 个位编码层)、MA 构建期菜单/参数、部件层级、资产目录、技术栈
+- concepts/[[unity-mcp-avatar-introspection]] — Unity MCP 探查 VRChat 项目的工作流:assets-find/animator-get-data 大结果 grep 处理、script-execute 反射模式(SDK 3.8 descriptor 图层是字段不是属性)、MA/VRCFury 组件枚举、MA 项目判读要点
+- 来源:2026-08-16 通过 Unity MCP 对 E:\ALCOM_save\Lapwing-min 的完整探查(asset 检索 + 控制器解析 + 场景反射)
+- index 新增 Projects 分类,总页数 10 → 12
