@@ -38,8 +38,8 @@ Lapwing-min avatar 的发色切换从「瞬切」升级为「溶解消失 → �
 ## 资产（Assets/动画/HairDissolve/）
 
 - `Mask_Dissolve.png` — 共享溶解遮罩（256² 垂直渐变 0.02→1 + 噪声，自下而上溶解），程序生成
-- `Clips/Hair_FadeOut.anim` / `Hair_FadeIn.anim` — 溶解 `_DissolveParams.z` 0→1 / 1→0（0.25s，7 个绑定：5 发色槽 + HairPony 槽1 阴影 + FakeShadow alpha）
-- `Clips/Hair_Mat_0..7.anim` — 2 帧：`m_IsActive` 网格开关 + `m_Materials.Array.data[0]` PPtr 材质槽
+- `Clips/Hair_FadeOut.anim` / `Hair_FadeIn.anim` — 溶解 `_DissolveParams.z` 0→1 / 1→0（0.25s，**最终版 4 个绑定**：HairPony 槽0 + LowPonytail Back/Bangs/RibbonA 槽0。RibbonB 已移除（场景非激活）；两个槽1 阴影材质（Lap_Shadow/FakeShadow）不参与溶解——Animation 窗口无法显示槽1 的材质数组绑定，且阴影短暂残留视觉可接受）
+- `Clips/Hair_Mat_0..7.anim` — 2 帧：`m_IsActive` 网格开关 + `m_Materials.Array.data[0]` PPtr 材质槽（无 RibbonB）
 - `HairHubFX.controller` — 见下
 
 材质：9 个发色/阴影材质启用 `LIL_FEATURE_DISSOLVE` + `LIL_FEATURE_DissolveMask`，`_DissolveParams=(1,0,0,0.12)`（mode=1 遮罩、b=阈值、a=柔和）。lilToon 语义：`mask值 > b 可见`，b 从 0→1 即溶解消失；关键字门槛在 `lil_common_frag_alpha.hlsl`（`LIL_FEATURE_DISSOLVE`）与 `lil_common_frag.hlsl`（`LIL_FEATURE_DissolveMask`）。
