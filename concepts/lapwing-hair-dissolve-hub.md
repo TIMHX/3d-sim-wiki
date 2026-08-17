@@ -16,13 +16,16 @@ Lapwing-min avatar 的发色切换从「瞬切」升级为「溶解消失 → �
 
 8 色两两配对需要 56 条过渡连线（O(N²)），加色不可扩展。Hub 机制把「检测变化」和「执行溶解」分层，加第 N+1 色 = 1 材质 + 1 动画 + 2 连线。
 
-## 最终架构（2026-08-17 交叉溶解版 v3）
+## 最终架构（2026-08-17 交叉溶解版 v3.2，用户确认可用）
 
-用户要求 FadeIn/FadeOut **同时发生**（串行三段式有"半头发/无头发"的空窗期）→ 改为**真·交叉溶解**：
+用户要求 FadeIn/FadeOut **同时发生**（串行三段式有"半头发/无头发"的空窗期）→ 真·交叉溶解：
 
-- **替身渲染器（ghost）**：`头发/HairPony_Crossfade` + `头发/LowPonytail_A_Lapwing/LowPonytail_{Back,Bangs,RibbonA}_Crossfade`（复制原网格+骨骼，默认隐藏；**注意渲染器组件必须 enabled，靠 GameObject inactive 隐藏**）。
-- **三段流水线状态机（v3.1）**：每色 3 个状态 `Swap_N`（2 帧，仅 PPtr 换替身材质）→ `Cross_N`（0.25s，仅溶解曲线+开关）→ `Promote_N`（2 帧，PPtr 移交真身+最终开关，常驻）。**原因：同 clip 内 PPtr 换材质槽与材质属性动画冲突**（Unity 已知行为——换槽后属性曲线仍写旧实例，新材质以资产默认值渲染），必须拆开。`AnyState → Swap_N`（发色菜单=N，self=false）。
-- **`Hair_Cross_N` 动画自包含**：t=0 强制写全向量 `_DissolveParams=(1,0,z,0)`（x=模式 y=形状 w=柔度），材质存储参数被改也不静默失败；z 端点按用户校准 **-0.34=完全显示 / 1=完全消失**。
+- **替身渲染器（ghost）**：`头发/HairPony_Crossfade` + `头发/LowPonytail_A_Lapwing/LowPonytail_{Back,Bangs,RibbonA}_Crossfade`（复制原网格+骨骼，默认隐藏；**渲染器组件必须 enabled，靠 GameObject inactive 隐藏**）。
+- **触发门禁（解决 AnyState 死循环）**：`Sensor_HairColor` 层（w=1）8 个常驻 Sens_N 状态各带 VRC Parameter Driver → Set HairFadeTrigger；`AnyState→Sens_N`（发色菜单=N, self=false）。**教训：AnyState 入口若用恒真 Int 条件，GM 模拟器持续重评估会在链条中途无限重触发（Swap↔Cross 闪烁、Promote 永不点亮）；触发器消费一次即消失是正解。** Play 模式下 driver 正常工作。
+- **三段流水线**（`Action_HairColor` 层，w=1）：`AnyState→Swap_N`【HairFadeTrigger + 发色菜单=N】→ `Swap_N`(2帧，仅 PPtr 换替身材质，替身仍隐藏) →exit1→ `Cross_N`(0.25s，纯溶解曲线+开关，新旧同时交叉) →exit1→ `Promote_N`(2帧，PPtr 移交真身+最终开关+**溶解复位键**，常驻)。
+- **`Hair_Cross_N` 动画自包含**：t=0 强制全向量 `_DissolveParams=(1,0,z,0)`；z 端点按用户校准 **-0.34=完全显示 / 1=完全消失**。
+- **Promote 必须带溶解复位键**：WD=off 会把上一状态最后采样值（Cross 结尾 z=1）每帧继续写进新换的材质 → 真身隐形光头。复位键 z=-0.34 与资产默认一致，同帧 PPtr 无冲突。
+- 控制器：**`Assets/动画/LapFX FT Active.controller`**（descriptor 引用的 FX，GestureManager 测试读它）；`LapwingBody FT.controller`（场景预览）与 `LapFX FT Stale.controller`（旧副本）同步。⚠️ 历史教训：改文件前先查 descriptor 指向，曾因两份同名控制器改错文件白忙一轮。
 - 控制器：**`Assets/动画/LapFX FT Active.controller`**（descriptor 引用的 FX，GestureManager 测试读的就是它）末尾 Action_HairColor 层；`LapwingBody FT.controller` 有同名预览层。⚠️ 历史教训：项目里曾同时存在两份 LapFX FT.controller（素体/Hash's_Things 下有一份），descriptor 指向 动画/ 那份——改错文件导致测试永远不生效。旧副本已改名为 `LapFX FT Stale.controller`。
 - 旧资产已删：Hair_FadeOut/FadeIn/Hair_Mat_0..7、HairHubFX.controller、发色菜单_1/2/3 孤儿参数（控制器+表达式资产均已清）。
 
