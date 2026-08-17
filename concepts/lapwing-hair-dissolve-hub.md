@@ -23,7 +23,7 @@ Lapwing-min avatar 的发色切换从「瞬切」升级为「溶解消失 → �
 - **替身渲染器（ghost）**：`头发/HairPony_Crossfade` + `头发/LowPonytail_A_Lapwing/LowPonytail_{Back,Bangs,RibbonA}_Crossfade`（复制原网格+骨骼，默认隐藏）。换色时新色先加载到替身（全透明），替身渐入的同时旧真身渐出，最后真身接棒、替身隐藏——同发型换色和跨发型换色统一处理。
 - **`Hair_Cross_0..7.anim`**（0.25s，不循环）：所有真身溶解 0→1；目标发型的替身 1→0；结尾帧 PPtr 移交材质给真身 + m_IsActive 交接 + 目标真身溶解复位 0。
 - **状态机极简**：每色常驻状态 `Color_0..7`（WD=off，motion=Hair_Cross_N）+ `AnyState → Color_N`（发色菜单=N，self=false，dur=0）。**无 Sensor 层、无 Trigger、无 Parameter Driver**。
-- 控制器：`LapFX FT.controller` 末尾 Action_HairColor 层（**重点**——用户测试只用 Play+GestureManager，只读 descriptor 引用的控制器）；`LapwingBody FT.controller` 有同名预览层。
+- 控制器：**`Assets/动画/LapFX FT Active.controller`**（descriptor 引用的 FX，GestureManager 测试读的就是它）末尾 Action_HairColor 层；`LapwingBody FT.controller` 有同名预览层。⚠️ 历史教训：项目里曾同时存在两份 LapFX FT.controller（素体/Hash's_Things 下有一份），descriptor 指向 动画/ 那份——改错文件导致测试永远不生效。旧副本已改名为 `LapFX FT Stale.controller`。
 - 旧资产已删：Hair_FadeOut/FadeIn/Hair_Mat_0..7、HairHubFX.controller、发色菜单_1/2/3 孤儿参数（控制器+表达式资产均已清）。
 
 ## 颜色映射（发色菜单 Int → 发型/材质）
