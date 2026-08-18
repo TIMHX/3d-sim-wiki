@@ -1,7 +1,7 @@
 ---
 title: Lapwing 服装溶解复杂度分析（能否复用发色 Hub）
 created: 2026-08-17
-updated: 2026-08-17
+updated: 2026-08-18
 type: analysis
 tags: [vrchat, unity, vrchat-avatar, algorithm]
 sources: []
@@ -11,6 +11,8 @@ confidence: high
 # Lapwing 服装溶解复杂度分析（能否复用发色 Hub）
 
 发色溶解 Hub（见 [[lapwing-hair-dissolve-hub|Lapwing 发色溶解 Hub]]）能否用于衣服切换的复杂度分析。结论：**材质替换情形 O(n) 直接可行；不同模型情形在"逐对定制"或"逐件标定"下是 O(n²)，但采用全局统一扫描区间 + 单共享 Cross clip 可压回 O(n+m)**。
+
+> ✅ **2026-08-18 已落地**：Midnight 的 4 套衣服恰好是同一套网格（同 FBX），走**情形 A（同网格换材质 O(n)）**直接实现成功，见 [[lapwing-clothes-dissolve|Lapwing 衣服溶解]]。
 
 ## 情形 A：只换材质（同网格）——O(n)
 

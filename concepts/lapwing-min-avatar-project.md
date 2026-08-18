@@ -1,7 +1,7 @@
 ---
 title: Lapwing-min Avatar Project (VRChat)
 created: 2026-08-16
-updated: 2026-08-16
+updated: 2026-08-18
 type: summary
 tags: [unity, vrchat, vrchat-avatar, asset-management]
 sources: []
@@ -77,6 +77,10 @@ FX 层：`LapFX FT.controller`（PC）/ `LapFX FT min.controller`（Quest）/ `L
 `Assets/动画/Midnight/*.anim`：Black/BlackWhite/Brown/GreenWhite/Touch_Head/Default_原始材质 Midnight min。
 
 场景自身控制器（`LapwingBody FT.controller` 等）为单层「材质菜单」控制器：状态 = Default/Jacket/Demon/Cape/hairPony/hairLowPony/Heather_x/Touch Head/原始材质，参数 = 头发菜单/瞳色菜单(Int)+位 Bool。注意 `Assets/动画/Body2.controller` 为空控制器（无参数无状态，疑似未使用）。
+
+## Midnight 衣服溶解（2026-08-18）
+
+Midnight 的 4 套衣服（BlackWhite/GreenWhite/Black/Brown）合并为单网格 + 材质切换 + 单前沿交叉溶解（复用发色 Hub），详见 [[lapwing-clothes-dissolve|Lapwing 衣服溶解]]。相关：删 3 套 prefab、建替身 `服装/Clothes_Crossfade`（共享骨架）、`Assets/动画/Midnight/Clothes/` 12 个 clip、`LapFX FT Midnight.controller` + `Lapwing Midnight.controller` 各加 Sensor_Clothes/Action_Clothes 两层。
 
 ## Assets 目录（顶层）
 

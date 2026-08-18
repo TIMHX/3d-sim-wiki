@@ -1,7 +1,7 @@
 ---
 title: Wiki Log
 created: 2026-07-22
-updated: 2026-08-17
+updated: 2026-08-18
 type: meta
 tags: [meta]
 ---
@@ -78,3 +78,10 @@ tags: [meta]
 - Can the hair dissolve hub generalize to clothing? Material-only = O(n) direct port
 - Different-mesh outfits: per-pair naive = O(n²); single-front mirror imposes pairwise constraints → per-outfit calibration also O(n²) in effect quality
 - Escape hatch: one global unified sweep range + ONE shared Cross clip → O(1) calibration, O(1) per new outfit, O(n+m) total; trade-offs documented
+
+## [2026-08-18] create | lapwing-clothes-dissolve (first-hand implementation)
+- concepts/[[lapwing-clothes-dissolve]] — Midnight 衣服溶解落地:4 套衣服是同网格换材质(情形 A O(n))、单网格合并+替身共享骨架、单前沿取负镜像、边界标定 complete=-1.0/gone=0.6、Sensor/Action 两层
+- 踩坑:替身镜像必须取负(非 2*complete-z)、clip 需显式 x/y/w 常量、rootBone 共享、complete 不能压最低点(严格不等式露白边)、脚本加 behaviour 需 CreateInstance+AddObjectToAsset
+- update:[[lapwing-clothes-dissolve-analysis]] 标注情形 A 已落地;[[lapwing-min-avatar-project]] 增衣服溶解节
+- 来源:2026-08-18 通过 Unity MCP 全流程实现,用户 Play 验证通过
+- index 总页数 13 → 14
