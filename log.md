@@ -90,3 +90,8 @@ tags: [meta]
 - 新增坑：Midnight `头发/HairPony_Crossfade` 替身 `m_Mesh` 指向已删 GUID（`2dd8ed6f…`）→ `sharedMesh=null` → Cross 阶段不渲染（光头）→ Promote 瞬现
 - 教训：控制器/动画/材质全共享且等价，唯一差异在场景替身 mesh 引用；「同动画同材质」不能排除场景层差异，排查需逐替身验 `sharedMesh != null`
 - 修复：改回真身同款 BakedMesh `HairPony(Clone).asset`（guid 25b2ce01…）
+
+## [2026-08-19] update | lapwing-hair-dissolve-hub + lapwing-clothes-dissolve
+- 新增坑：溶解门禁 trigger（HairFadeTrigger/ClothesFadeTrigger）是 VRChat 本地信号——expression params 无 Trigger 类型、trigger 瞬态消费，远程/mirror 完全没动静（本地正常；PC 旧衣服 synced Bool 直驱故远程正常）
+- 修复（用户 VRChat 实测成功）：Trigger(9)→Bool(4) + expression params 加 Bool synced + Sensor 置 true + Action 过渡 `==true` + Swap 首态复位 false
+- 子坑：复位必须放首态 Swap 不能放尾态 Promote，否则 bool 在 Cross 0.4s 期间仍 true 致 `AnyState→Swap` 重入、Swap↔Cross 高速闪烁

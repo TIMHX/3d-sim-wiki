@@ -1,7 +1,7 @@
 ---
 title: Lapwing 衣服溶解（Midnight 单网格换材质 + 单前沿交叉）
 created: 2026-08-18
-updated: 2026-08-18
+updated: 2026-08-19
 type: summary
 tags: [vrchat, unity, vrchat-avatar, asset-management]
 sources: []
@@ -55,7 +55,7 @@ confidence: high
 
 - **触发门禁** `Sensor_Clothes`(w=1)：AnyState→Sens_N `[衣服菜单=N, self=false]` + VRC Parameter Driver → Set `ClothesFadeTrigger`。
 - **三段流水线** `Action_Clothes`(w=1, 默认 Promote_0)：AnyState→Swap_N `[ClothesFadeTrigger + 衣服菜单=N]` → Swap_N(2帧 PPtr 换替身材质) →exit1→ Cross_N(0.4s 单前沿) →exit1→ Promote_N(2帧 PPtr 移交真身+复位 z=-1.0+关替身)。
-- 全 WD=off；`ClothesFadeTrigger` 是控制器本地 Trigger（不进 expression parameters，同 HairFadeTrigger）。
+- 全 WD=off；`ClothesFadeTrigger` 原本是控制器本地 Trigger，**2026-08-19 起改 synced Bool 请求位**（同 HairFadeTrigger）：Sensor 置 true、Swap 首态复位 false、expression params 加 Bool synced——Trigger 是 VRChat 本地信号远程不溶解，见 [[lapwing-hair-dissolve-hub]]。
 - 颜色映射：衣服菜单 0=BlackWhite / 1=GreenWhite / 2=Black / 3=Brown。
 
 ## 踩坑（实现时踩过）
@@ -65,6 +65,7 @@ confidence: high
 - **替身 rootBone 必须共享真身**，null 会被剔除不渲染。
 - **脚本加 StateMachineBehaviour**：`AddStateMachineBehaviour` 有返回值但 `st.behaviours` 数组不更新，要 `ScriptableObject.CreateInstance` + `AssetDatabase.AddObjectToAsset` + 手动塞进 `st.behaviours`。
 - 两控制器都要加层：`LapFX FT Midnight.controller`（descriptor FX，Play+GestureManager 测试用）+ `Lapwing Midnight.controller`（场景预览 Animator，录制动画用）。
+- **ClothesFadeTrigger 是 VRChat 本地 trigger（2026-08-19 修复）**：Trigger 瞬态信号远程/mirror 不溶解，改 synced Bool 请求位 + **Swap 首态复位 false**（复位放 Promote 会 AnyState 重入高速闪烁）。同头发，见 [[lapwing-hair-dissolve-hub]]。
 
 ## Related
 
