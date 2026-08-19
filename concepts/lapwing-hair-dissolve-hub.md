@@ -1,7 +1,7 @@
 ---
 title: Lapwing 发色溶解 Hub（坐标溶解 · 单前沿交叉 · 双头像）
 created: 2026-08-17
-updated: 2026-08-17
+updated: 2026-08-19
 type: summary
 tags: [vrchat, unity, vrchat-avatar, asset-management]
 sources: []
@@ -93,6 +93,7 @@ Midnight 与 PC 共用全部头发材质（同 GUID）且头发模型一致 → 
 - **出生时 Sensor 默认态触发一次** → 出生自带一次发色渐入（当作生成特效）
 - 快速连续换色：trigger 残留导致透明期变长，但每次交换重读最新发色菜单值，落点正确
 - 未验证项：实际游戏内溶解视觉效果（需上传 VRChat 实测）
+- **替身 mesh 引用失效（2026-08-19，Midnight `HairPony_Crossfade`）**：移植替身时 `SkinnedMeshRenderer.m_Mesh` 指向已删除 GUID（`2dd8ed6f…`，`GUIDToAssetPath` 返回空），`sharedMesh=null`。症状：Cross 阶段替身不渲染 → 旧发溶出露光头 → Promote 新色瞬现（假"瞬间切换"）。控制器/动画/材质全部共享且等价，唯一差异在场景替身 mesh 引用 —— 所以「两者用同一组动画和材质」不能排除场景层差异。排查：逐替身验证 `sharedMesh != null`（其余 3 个 LowPonytail 替身、Clothes_Crossfade 12 渲染器均正常，仅 HairPony 坏）。修复：`m_Mesh` 改回真身同款 BakedMesh（`{fileID:4300000, guid:25b2ce0173cf3a046b4efd62a4749621}` = `HairPony(Clone).asset`）。
 
 ## 回档
 

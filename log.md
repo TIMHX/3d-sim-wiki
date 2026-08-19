@@ -1,7 +1,7 @@
 ---
 title: Wiki Log
 created: 2026-07-22
-updated: 2026-08-18
+updated: 2026-08-19
 type: meta
 tags: [meta]
 ---
@@ -85,3 +85,8 @@ tags: [meta]
 - update:[[lapwing-clothes-dissolve-analysis]] 标注情形 A 已落地;[[lapwing-min-avatar-project]] 增衣服溶解节
 - 来源:2026-08-18 通过 Unity MCP 全流程实现,用户 Play 验证通过
 - index 总页数 13 → 14
+
+## [2026-08-19] update | lapwing-hair-dissolve-hub
+- 新增坑：Midnight `头发/HairPony_Crossfade` 替身 `m_Mesh` 指向已删 GUID（`2dd8ed6f…`）→ `sharedMesh=null` → Cross 阶段不渲染（光头）→ Promote 瞬现
+- 教训：控制器/动画/材质全共享且等价，唯一差异在场景替身 mesh 引用；「同动画同材质」不能排除场景层差异，排查需逐替身验 `sharedMesh != null`
+- 修复：改回真身同款 BakedMesh `HairPony(Clone).asset`（guid 25b2ce01…）
