@@ -102,3 +102,12 @@ tags: [meta]
 - 创建 [[gaussgym|GaussGym: 3DGS 实景转仿真机器人训练框架]] — 全面报告：场景生成管线(VGGT/NKSR/gsplat)、3DGS drop-in renderer、吞吐优化(100K steps/s)、运动模糊、DinoV2+LSTM 架构、RGB vs depth 实验、ablation、对比表、代码数据、局限性、对机器人项目启示
 - Raw 源归档：raw/papers/gaussgym-arxiv-2510-15352.md、raw/articles/gaussgym-github-readme.md、raw/articles/gaussgym-website.md（均带 sha256 frontmatter）
 - 更新 index.md（Concepts 新增 gaussgym，Total pages 14 → 15）
+
+## [2026-08-24] ingest | 扫描场景自动物理属性标注调研（机器人项目延伸）
+
+- 用户问 GaussGym 能否支持"扫描场景 + 自动标注摩擦/粗糙度"，结论：场景获取对口，物理标注是 GaussGym 自认空白，但已有独立研究路线
+- 创建 [[physical-property-estimation-from-scans|扫描场景自动物理属性标注（摩擦/粗糙度）]] — 四路线对比：Brandao 2016 (Friction from Vision, OSA+F/GTF 数据集)、VLM+RAG 摩擦估计 (2409.09845, WIP 实机)、PhysGS (CVPR 2026, 3DGS Bayesian 逐点物理属性, 代码未开源)、Sim Anything (2411.12789, MLLM-P3 零样本物理属性)
+- 衔接分析：估计摩擦 → PMAT__muXXX 命名映射 → isaac-ground-split 物理分区；粗糙度信号源(SH 系数 + mesh 几何起伏)
+- gaussgym.md 新增"十、延伸"章节 + wikilink
+- Raw 源归档：raw/articles/physgs-website.md、raw/articles/friction-from-vision-brandao-2016.md、raw/articles/vlm-friction-wip-arxiv-2409-09845.md、raw/articles/sim-anything-arxiv-2411-12789.md
+- 更新 index.md（Total pages 15 → 16）

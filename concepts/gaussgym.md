@@ -127,6 +127,10 @@ obstacle-field 实验：稀疏目标放在杂物后面，地面有黄色禁区 p
 - GaussGym 场景生成管线（iPhone/Polycam 采集 → VGGT/NKSR/gsplat）与我们 GS 采集经验（[[blender-construction-site-tutorial|Construction Site Tutorial]] 之外的真实场景方向）可直接复用，iPhone 采集 + 4090 训练正好是我们已有的硬件组合。
 - 注意迁移成本：GaussGym 用 IsaacGym（旧 API）而非 IsaacLab，自建环境需要把我们的 URDF 和任务配置移植过去。若导师要求 literature review 覆盖"real-to-sim 视觉训练"这一前沿，GaussGym 是 2025 下半年最具代表性的 open baseline。
 
+## 十、延伸：自动物理属性标注（摩擦/粗糙度）
+
+扫描场景后自动标注表面摩擦力和粗糙度，GaussGym 本身不提供（统一物理参数是它的已知局限），但有独立研究路线可接，详见 [[physical-property-estimation-from-scans|扫描场景自动物理属性标注]]。核心选项：PhysGS（3DGS 逐点物理属性估计，CVPR 2026）、VLM+RAG 摩擦估计（零样本，最快落地）、Brandao 2016（经典基线）。估计结果可映射到现有 `PMAT__muXXX` 体系（[[isaac-friction-profiles]]）。
+
 ## 参考来源
 
 - arXiv 论文全文：raw/papers/gaussgym-arxiv-2510-15352.md
