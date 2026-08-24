@@ -1,7 +1,7 @@
 ---
 title: Wiki Log
 created: 2026-07-22
-updated: 2026-08-19
+updated: 2026-08-24
 type: meta
 tags: [meta]
 ---
@@ -32,7 +32,8 @@ tags: [meta]
 - 2026-07-22 (update): Added H-key shortcuts — hide/unhide in Edit Mode, isolate geometry workflow
 - 2026-07-22 (update): Added D-key shortcuts — duplicate-in-place (Shift+D+RMB), annotate tool (D+draw), erase annotations (D+D)
 - 2026-07-22 (update): Expanded Navigation + Numpad section — orbit keys (2468), all axis views (front/back/right/left/top/bottom), quad view (Ctrl+Alt+Q), align camera to view, fly/walk mode, laptop/numpad-less setup
-- 2026-08-06 (create): [[isaaclab-docker-env|IsaacLab Docker Environment (tim-pc)]] — robot project docker setup: repo @2.3.0/feature/navigation, gh auth isolation, isaac-lab-base image, daily commands, cleanup history
+
+## [2026-08-06 (create): [[isaaclab-docker-env|IsaacLab Docker Environment (tim-pc)]] — robot project docker setup: repo @2.3.0/feature/navigation, gh auth isolation, isaac-lab-base image, daily commands, cleanup history
 - 2026-08-06 (create): [[isaaclab-operation-manual|IsaacLab Operation Manual]] — 完整操作手册(容器/GUI/Blender场景导入/navigation训练)，替代分散的本地 markdown 副本
 
 ## [2026-08-16] create | Isaac env pipeline pages (first-hand, 5 pages)
@@ -95,3 +96,9 @@ tags: [meta]
 - 新增坑：溶解门禁 trigger（HairFadeTrigger/ClothesFadeTrigger）是 VRChat 本地信号——expression params 无 Trigger 类型、trigger 瞬态消费，远程/mirror 完全没动静（本地正常；PC 旧衣服 synced Bool 直驱故远程正常）
 - 修复（用户 VRChat 实测成功）：Trigger(9)→Bool(4) + expression params 加 Bool synced + Sensor 置 true + Action 过渡 `==true` + Swap 首态复位 false
 - 子坑：复位必须放首态 Swap 不能放尾态 Promote，否则 bool 在 Cross 0.4s 期间仍 true 致 `AnyState→Swap` 重入、Swap↔Cross 高速闪烁
+
+## [2026-08-24] ingest | GaussGym literature review (机器人项目)
+- 研究 gauss-gym.com / arXiv 2510.15352 / github.com/escontra/gauss_gym / HF datasets，机器人项目导师布置的 literature review
+- 创建 [[gaussgym|GaussGym: 3DGS 实景转仿真机器人训练框架]] — 全面报告：场景生成管线(VGGT/NKSR/gsplat)、3DGS drop-in renderer、吞吐优化(100K steps/s)、运动模糊、DinoV2+LSTM 架构、RGB vs depth 实验、ablation、对比表、代码数据、局限性、对机器人项目启示
+- Raw 源归档：raw/papers/gaussgym-arxiv-2510-15352.md、raw/articles/gaussgym-github-readme.md、raw/articles/gaussgym-website.md（均带 sha256 frontmatter）
+- 更新 index.md（Concepts 新增 gaussgym，Total pages 14 → 15）
