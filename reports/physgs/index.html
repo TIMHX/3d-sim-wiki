@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -95,9 +95,9 @@
 <header>
   <div><span class="pulse"></span><span style="font-size:12px;color:var(--muted)">LITERATURE REVIEW · ROBOTICS PROJECT · 2026-08-31</span></div>
   <h1 style="margin-top:10px">PhysGS: Bayesian-Inferred Gaussian Splatting<br>for Physical Property Estimation</h1>
-  <div class="sub">从多视角 RGB + VLM 先验, 用 Bayesian 推断估计 3DGS 逐点物理属性 (摩擦/硬度/刚度/密度/质量), 并输出校准的不确定性</div>
+  <div class="sub">Estimate per-point physical properties (friction, hardness, stiffness, density, mass) on 3DGS from multi-view RGB plus VLM priors, with calibrated uncertainty</div>
   <div class="meta">
-    <span class="tag">CVPR 2026</span><span class="tag g">arXiv:2511.18570</span><span class="tag v">UMD</span><span class="tag a">代码未开源</span>
+    <span class="tag">CVPR 2026</span><span class="tag g">arXiv:2511.18570</span><span class="tag v">UMD</span><span class="tag a">Code not released</span>
     Chopra · Liang · Seneviratne · Manocha — University of Maryland, College Park
   </div>
 </header>
@@ -106,7 +106,7 @@
 
 <!-- ============ ARCHITECTURE ============ -->
 <section>
-  <h2>系统架构</h2>
+  <h2>System Architecture</h2>
   <div class="diagram-card">
     <svg viewBox="0 0 1200 640" xmlns="http://www.w3.org/2000/svg" font-family="'JetBrains Mono',Consolas,monospace">
       <defs>
@@ -272,38 +272,38 @@
 
 <!-- ============ KEY NUMBERS ============ -->
 <section>
-  <h2>核心数字</h2>
+  <h2>Key Numbers</h2>
   <div class="cards">
     <div class="card">
-      <h3><span class="dot" style="background:var(--emerald)"></span>质量估计 (ABO-500)</h3>
+      <h3><span class="dot" style="background:var(--emerald)"></span>Mass (ABO-500)</h3>
       <ul>
-        <li>APE ↓22.8% <span class="muted small">(1.061 → 0.819)</span></li>
-        <li>ADE ↓5.5% <span class="muted small">(8.730 → 8.254)</span></li>
-        <li>ALDE/MnRE 略逊 NeRF2Physics</li>
+        <li>APE −22.8% <span class="muted small">(1.061 → 0.819)</span></li>
+        <li>ADE −5.5% <span class="muted small">(8.730 → 8.254)</span></li>
+        <li>ALDE/MnRE slightly behind NeRF2Physics</li>
       </ul>
     </div>
     <div class="card">
-      <h3><span class="dot" style="background:var(--violet)"></span>Shore 硬度 (31 点)</h3>
+      <h3><span class="dot" style="background:var(--violet)"></span>Shore Hardness (31 pts)</h3>
       <ul>
-        <li>ADE ↓61.2% <span class="muted small">(34.295 → 12.721)</span></li>
-        <li>ALDE ↓34.4%, APE ↓16.5%</li>
-        <li>MnRE ↑8.4%</li>
+        <li>ADE −61.2% <span class="muted small">(34.295 → 12.721)</span></li>
+        <li>ALDE −34.4%, APE −16.5%</li>
+        <li>MnRE +8.4%</li>
       </ul>
     </div>
     <div class="card">
-      <h3><span class="dot" style="background:var(--amber)"></span>动摩擦 (6 点)</h3>
+      <h3><span class="dot" style="background:var(--amber)"></span>Kinetic Friction (6 pts)</h3>
       <ul>
-        <li>ADE ↓15.5%, ALDE ↓18.1%</li>
-        <li>MnRE ↑9.4%</li>
-        <li class="muted small">样本量极小, 统计意义有限</li>
+        <li>ADE −15.5%, ALDE −18.1%</li>
+        <li>MnRE +9.4%</li>
+        <li class="muted small">tiny sample, limited statistical meaning</li>
       </ul>
     </div>
     <div class="card">
-      <h3><span class="dot" style="background:var(--cyan)"></span>Bayesian 更新贡献</h3>
+      <h3><span class="dot" style="background:var(--cyan)"></span>Bayesian Update Contribution</h3>
       <ul>
-        <li>Ablation: ADE ↓5.6%, APE ↓6.4%</li>
-        <li>多视角后验更新 vs 单视角固定</li>
-        <li>不确定性随 SAM 质量自适应</li>
+        <li>Ablation: ADE −5.6%, APE −6.4%</li>
+        <li>Multi-view posterior vs single-view</li>
+        <li>Uncertainty adapts to SAM quality</li>
       </ul>
     </div>
   </div>
@@ -311,35 +311,35 @@
 
 <!-- ============ METHOD ============ -->
 <section>
-  <h2>方法: 三层 Bayesian 模型</h2>
+  <h2>Method: Three-Layer Bayesian Model</h2>
 
-  <h3><span class="tag v">1</span> 离散材质 — Dirichlet–Categorical (闭式共轭更新)</h3>
-  <div class="formula"><span class="lbl">后验预测 (观测集合 Z 后, 新观测属于材质 i 的概率)</span>
+  <h3><span class="tag v">1</span> Discrete material — Dirichlet–Categorical (closed-form conjugate update)</h3>
+  <div class="formula"><span class="lbl">Predictive posterior (probability that a new observation belongs to material i given observed set Z)</span>
     f(z = i | Z, α) = ᾱᵢ / Σⱼ ᾱⱼ ,&nbsp;&nbsp; ᾱᵢ ← αᵢ(0) + Σ_{m: cₘ=i} λ·pₘ
   </div>
-  <p class="small muted">λ = 每条观测的证据强度; pₘ = VLM 置信度。置信度加权 → VLM 越犹豫, 贡献越小; 多候选的置信度分布本身就是语义歧义信号。</p>
+  <p class="small muted">λ = evidence strength per observation; pₘ = VLM confidence. Confidence weighting means a hesitant VLM contributes less; the confidence distribution across material candidates is itself a signal of semantic ambiguity.</p>
 
-  <h3><span class="tag v">2</span> 连续属性 — 置信度加权矩 (流式, 不需存历史)</h3>
-  <div class="formula"><span class="lbl">累加器 + 后验均值/方差</span>
+  <h3><span class="tag v">2</span> Continuous property — confidence-weighted moments (streaming, no history storage)</h3>
+  <div class="formula"><span class="lbl">Accumulators + posterior mean/variance</span>
     Wᵢ = Σ pₘ, &nbsp; Sᵢ = Σ pₘψₘ, &nbsp; Qᵢ = Σ pₘψₘ² &nbsp;→&nbsp; μᵢ = Sᵢ/Wᵢ, &nbsp; σᵢ² = max(Qᵢ/Wᵢ − μᵢ², ε)
   </div>
-  <div class="formula"><span class="lbl">最终预测 = 高斯混合 (每材质一个 mode, 权重 = Dirichlet 后验)</span>
+  <div class="formula"><span class="lbl">Final prediction = Gaussian mixture (one mode per material, weights from Dirichlet posterior)</span>
     f(ψ | Z, α) = Σᵢ (ᾱᵢ / Σⱼ ᾱⱼ) · N(μᵢ, σᵢ²)
   </div>
 
-  <h3><span class="tag v">3</span> 不确定性 — Normal–Inverse–Gamma (NIG) 先验</h3>
-  <div class="formula"><span class="lbl">总预测方差分解 (key contribution)</span>
+  <h3><span class="tag v">3</span> Uncertainty — Normal–Inverse–Gamma (NIG) prior</h3>
+  <div class="formula"><span class="lbl">Total predictive variance decomposition (key contribution)</span>
     Var[ψᵢ] = E[σᵢ²] + Var[μᵢ] = β̃/(ᾱ−1) + E[σᵢ²]/κ̃
-    <br><span class="small" style="color:#94a3b8">aleatoric: 类内观测噪声 &nbsp;·&nbsp; epistemic: 证据不足/冲突, 随高置信证据增加而下降</span>
+    <br><span class="small" style="color:#94a3b8">aleatoric: within-class observation noise &nbsp;·&nbsp; epistemic: insufficient/conflicting evidence, shrinks as confident evidence accumulates</span>
   </div>
-  <p class="small muted">NIG 闭式更新: κ̃=κ+pₘ, τ̃=(κτ+pₘψₘ)/(κ+pₘ), ᾱ=α+pₘ/2, β̃=β+pₘκ(ψₘ−τ)²/(2(κ+pₘ)) — 全部在线增量, 适合 streaming 重建。</p>
+  <p class="small muted">NIG closed-form updates: κ̃=κ+pₘ, τ̃=(κτ+pₘψₘ)/(κ+pₘ), ᾱ=α+pₘ/2, β̃=β+pₘκ(ψₘ−τ)²/(2(κ+pₘ)) — all online increments, suitable for streaming reconstruction.</p>
 </section>
 
 <!-- ============ EXPERIMENTS ============ -->
 <section>
-  <h2>实验结果</h2>
+  <h2>Experimental Results</h2>
 
-  <h3>质量估计 (ABO-500 test, 100 物体)</h3>
+  <h3>Mass Estimation (ABO-500 test, 100 objects)</h3>
   <table>
     <tr><th>Method</th><th class="num">ADE ↓</th><th class="num">ALDE ↓</th><th class="num">APE ↓</th><th class="num">MnRE ↑</th></tr>
     <tr><td>Image2mass</td><td class="num">12.496</td><td class="num">1.792</td><td class="num">0.976</td><td class="num">0.341</td></tr>
@@ -351,7 +351,7 @@
 
   <div class="two-col">
     <div>
-      <h3>Shore 硬度 (31 点 / 11 物体)</h3>
+      <h3>Shore Hardness (31 pts / 11 objects)</h3>
       <table>
         <tr><th>Method</th><th class="num">ADE ↓</th><th class="num">ALDE ↓</th><th class="num">APE ↓</th><th class="num">MnRE ↑</th></tr>
         <tr><td>GPT-4V</td><td class="num">32.752</td><td class="num">0.330</td><td class="num">0.304</td><td class="num">0.758</td></tr>
@@ -361,7 +361,7 @@
       </table>
     </div>
     <div>
-      <h3>动摩擦 (6 点 / 6 物体)</h3>
+      <h3>Kinetic Friction (6 pts / 6 objects)</h3>
       <table>
         <tr><th>Method</th><th class="num">ADE ↓</th><th class="num">ALDE ↓</th><th class="num">APE ↓</th><th class="num">MnRE ↑</th></tr>
         <tr><td>GPT-4V</td><td class="num">0.209</td><td class="num">0.430</td><td class="num">0.549</td><td class="num">0.692</td></tr>
@@ -372,48 +372,48 @@
     </div>
   </div>
 
-  <div class="note"><b>诚实读数:</b> 摩擦只有 6 个测量点, 硬度 31 点, 都是小样本。质量估计在 ALDE/MnRE 上反而略输 NeRF2Physics (0.999 vs 0.771, 0.474 vs 0.552), 论文没有解释这一点。对外陈述用"质量 APE 降 22.8% / 硬度 ADE 降 61.2% / 摩擦 ALDE 降 18.1%"即可, 不要声称全面超越。</div>
+  <div class="note"><b>Honest reading:</b> Friction has only 6 measurement points and hardness 31, both small samples. On mass, PhysGS is behind NeRF2Physics on ALDE and MnRE (0.999 vs 0.771, 0.474 vs 0.552), which the paper does not explain. For external claims use: mass APE −22.8%, hardness ADE −61.2%, friction ALDE −18.1%. Do not claim a full sweep.</div>
 
-  <h3>户外泛化 (RUGD / RELLIS-3D, qualitative)</h3>
-  <p class="small">单张 RGB 出材质分割 + 摩擦 + Young's modulus + 总不确定性。杂乱场景 (枯叶 vs 木头, 泥 vs 草) SAM 分不干净 → 不确定度显著升高; 均匀大表面 (砾石, 草地) → 低不确定度 + 稳定预测。即不确定性对分割质量敏感, 能如实反映证据可信度 — 这是 "calibrated" 的证据。</p>
+  <h3>Outdoor Generalization (RUGD / RELLIS-3D, qualitative)</h3>
+  <p class="small">Single RGB produces material segmentation, friction, Young's modulus and total uncertainty. Cluttered scenes (dry leaves vs wood, mud vs grass) where SAM fails to separate → uncertainty rises sharply; large uniform surfaces (gravel, grass) → low uncertainty and stable predictions. Uncertainty is sensitive to segmentation quality and honestly reflects evidence reliability, which is the evidence for "calibrated".</p>
 </section>
 
 <!-- ============ COMPARISON ============ -->
 <section>
-  <h2>与相关工作对比</h2>
+  <h2>Comparison with Related Work</h2>
   <table>
-    <tr><th>方法</th><th>表示</th><th>机制</th><th>不确定性</th><th>多属性</th><th>代码</th></tr>
-    <tr><td>NeRF2Physics (ICRA'24)</td><td>NeRF</td><td>语言嵌入空间 + zero-shot kernel regression</td><td>✗</td><td>✓</td><td>✓</td></tr>
-    <tr><td>GaussianProperty</td><td>3DGS</td><td>同 NeRF2Physics 思路搬上高斯球</td><td>✗</td><td>✓</td><td>部分</td></tr>
-    <tr><td>LERF / LangSplat</td><td>NeRF/3DGS</td><td>CLIP 特征蒸馏成可查询 3D 语言场</td><td>✗</td><td>语义非物理</td><td>✓</td></tr>
-    <tr><td>EVORA</td><td>2D 图</td><td>evidential traction 分布</td><td>✓ (aleatoric+epistemic)</td><td>摩擦为主</td><td>✓</td></tr>
-    <tr><td>Ewen et al.</td><td>2D 图</td><td>语义 + 连续属性联合信念</td><td>✓</td><td>摩擦为主</td><td>✗</td></tr>
-    <tr><td>STEP</td><td>2D 图</td><td>CVaR 风险规划 (DARPA SubT)</td><td>✓</td><td>traversability</td><td>✗</td></tr>
-    <tr><td><b>PhysGS</b></td><td><b>3DGS</b></td><td><b>Dirichlet + NIG Bayesian 融合 VLM 先验</b></td><td><b>✓ 完整分解</b></td><td><b>✓ 5 种属性</b></td><td>✗ coming soon</td></tr>
+    <tr><th>Method</th><th>Representation</th><th>Mechanism</th><th>Uncertainty</th><th>Multi-property</th><th>Code</th></tr>
+    <tr><td>NeRF2Physics (ICRA'24)</td><td>NeRF</td><td>Language-embedding space + zero-shot kernel regression</td><td>✗</td><td>✓</td><td>✓</td></tr>
+    <tr><td>GaussianProperty</td><td>3DGS</td><td>Same idea moved onto Gaussians</td><td>✗</td><td>✓</td><td>Partial</td></tr>
+    <tr><td>LERF / LangSplat</td><td>NeRF/3DGS</td><td>CLIP feature distillation into queryable 3D language fields</td><td>✗</td><td>Semantic, not physics</td><td>✓</td></tr>
+    <tr><td>EVORA</td><td>2D map</td><td>Evidential traction distribution</td><td>✓ (aleatoric+epistemic)</td><td>Friction-focused</td><td>✓</td></tr>
+    <tr><td>Ewen et al.</td><td>2D map</td><td>Joint belief over semantics + continuous property</td><td>✓</td><td>Friction-focused</td><td>✗</td></tr>
+    <tr><td>STEP</td><td>2D map</td><td>CVaR risk planning (DARPA SubT)</td><td>✓</td><td>Traversability</td><td>✗</td></tr>
+    <tr><td><b>PhysGS</b></td><td><b>3DGS</b></td><td><b>Dirichlet + NIG Bayesian fusion of VLM priors</b></td><td><b>✓ full decomposition</b></td><td><b>✓ 5 properties</b></td><td>✗ coming soon</td></tr>
   </table>
-  <p class="small muted">定位: 第一个把完整分层 Bayesian 推断嵌入 3DGS 的工作, 同时覆盖点级 + 物体级, 室内 + 室外。NeRF2Physics 是直接前身和最强 baseline, PhysGS 用 3DGS 的显式性 + 可查询性 + 不确定性换掉了 NeRF 的隐式场。</p>
+  <p class="small muted">Positioning: the first work to embed a full hierarchical Bayesian inference in 3DGS, covering point-level + object-level, indoor + outdoor. NeRF2Physics is the direct predecessor and strongest baseline; PhysGS trades NeRF's implicit field for 3DGS's explicitness, queryability and uncertainty.</p>
 </section>
 
 <!-- ============ LIMITS ============ -->
 <section>
-  <h2>局限性与工程注意</h2>
-  <div class="limitation"><b>论文自认:</b> ①对 SAM 分割质量敏感 — mask 合并视觉相似材质时属性估计继承歧义, 未来方向是 VLM-guided 分割细化; ②阴影演化未建模; ③材质参数靠手工设定, 无自动赋值。</div>
-  <div class="limitation"><b>工程视角 (我的补充):</b> ①代码未开源 — "Coming Soon" 停在论文版, 复现只能等官方 release; ②GPT-5 闭源商业 API, 每次推理花钱, 换成开源 VLM 性能未知 (无 ablation); ③SAM→GPT-5 两段误差级联, Bayesian 置信度加权只能缓解不能消除; ④"逐点"实际是"逐材质" — 先按材质类估属性再 propagate 到点, 材质分类错则点全错; ⑤评估集小 (6 摩擦点, 15 物体), 户外只有定性。</div>
+  <h2>Limitations and Engineering Notes</h2>
+  <div class="limitation"><b>Stated by the paper:</b> ① Sensitive to SAM segmentation quality — when masks merge visually similar materials, property estimates inherit the ambiguity; future direction is VLM-guided segmentation refinement; ② Shadow evolution not modeled; ③ Material parameters are set manually, no automatic assignment.</div>
+  <div class="limitation"><b>Engineering view (our additions):</b> ① Code not released — "Coming Soon" at the CVPR 2026 paper stage, reproduction waits for the official release; ② GPT-5 is a closed commercial API, each inference costs money, performance with open VLM (Qwen-VL, InternVL) is unknown, no ablation; ③ SAM→GPT-5 two-stage error cascade — Bayesian confidence weighting mitigates but cannot remove it; ④ "Per-point" is really "per-material" — properties are estimated per material class then propagated to points; a wrong class corrupts all its points; ⑤ Small evaluation sets (6 friction points, 15 objects), outdoor only qualitative.</div>
 </section>
 
 <!-- ============ FOR US ============ -->
 <section>
-  <h2>对机器人项目的意义</h2>
-  <div class="takeaway"><b>输出可直接映射 PMAT__muXXX:</b> 逐点摩擦 → 区域聚合 → PMAT__mu080/mu100 材质名 → 喂 IsaacLab 摩擦解析链, 比手工标注快一个量级。这正是我们 [[physical-property-estimation-from-scans]] 调研里的核心路线之一。</div>
-  <div class="takeaway"><b>不确定性 = 主动采样引导:</b> epistemic 高估的区域就是该去实地测摩擦的地方 — 比单点估计更工程友好, 能指导"哪里值得再标一针"。</div>
-  <div class="takeaway"><b>与 GaussGym 互补:</b> GaussGym 解决"场景怎么来" (扫描 → sim 分钟级), PhysGS 解决"场景物理属性怎么标" (逐点摩擦/硬度), 合起来补上 GaussGym 自认的"资产物理参数统一"短板。</div>
-  <div class="takeaway"><b>落地路径:</b> 等官方代码 → 或参考 EVORA / Ewen et al. 自研路线, 用开源 VLM + 简化 Bayesian 融合自己搭 (VLM+RAG 方案是最快 prototype, 详见 physical-property-estimation 页)。</div>
+  <h2>Implications for the Robot Project</h2>
+  <div class="takeaway"><b>Output maps directly to PMAT__muXXX:</b> per-point friction → region aggregation → PMAT__mu080/mu100 material names → feed the IsaacLab friction parsing chain, an order of magnitude faster than manual labeling. This is one of the core routes in our physical-property-estimation review.</div>
+  <div class="takeaway"><b>Uncertainty = active sampling guidance:</b> high-epistemic regions are exactly where we should physically measure friction. More engineering-friendly than single-point estimates, it tells us "where it is worth another measurement".</div>
+  <div class="takeaway"><b>Complements GaussGym:</b> GaussGym solves "where the scene comes from" (scan to sim in minutes), PhysGS solves "how to label scene physics" (per-point friction/hardness). Together they close GaussGym's self-admitted gap of uniform asset physics parameters.</div>
+  <div class="takeaway"><b>Adoption path:</b> wait for official code → or follow the EVORA / Ewen et al. self-built route with an open VLM + simplified Bayesian fusion (the VLM+RAG prototype is the fastest first step, see the physical-property-estimation page).</div>
 </section>
 
 </main>
 
 <footer>
-  PhysGS: Bayesian-Inferred Gaussian Splatting for Physical Property Estimation · Chopra, Liang, Seneviratne, Manocha (UMD) · CVPR 2026 pp.18980-18990 · arXiv:2511.18570 · 报告入库: 3d-sim-wiki concepts/physgs.md · 2026-08-31
+  PhysGS: Bayesian-Inferred Gaussian Splatting for Physical Property Estimation · Chopra, Liang, Seneviratne, Manocha (UMD) · CVPR 2026 pp.18980-18990 · arXiv:2511.18570 · Stored in 3d-sim-wiki concepts/physgs.md · 2026-08-31
 </footer>
 
 </body>

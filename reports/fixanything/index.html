@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -85,9 +85,9 @@
 <header>
   <div><span class="pulse"></span><span style="font-size:12px;color:var(--muted)">LITERATURE REVIEW · ROBOTICS PROJECT · 2026-08-31</span></div>
   <h1 style="margin-top:10px">FixAnything: 3D-Consistent Rendering Refinement<br>via Video Generative Priors</h1>
-  <div class="sub">一个通用视频扩散模型修复 3DGS / NeRF / mesh / 稀疏点云的渲染伪影 —— 把渲染清理重定义为 video-to-video 翻译</div>
+  <div class="sub">A single generalist video model fixes rendering artifacts from 3DGS, NeRF, meshes, and sparse point clouds, by reframing cleanup as video-to-video translation</div>
   <div class="meta">
-    <span class="tag">ECCV 2026</span><span class="tag g">arXiv:2608.23549</span><span class="tag v">CMU</span><span class="tag a">代码未开源</span>
+    <span class="tag">ECCV 2026</span><span class="tag g">arXiv:2608.23549</span><span class="tag v">CMU</span><span class="tag a">Code coming soon</span>
     Vuong · Ramanan · Narasimhan — Carnegie Mellon University
   </div>
 </header>
@@ -96,7 +96,7 @@
 
 <!-- ============ ARCHITECTURE ============ -->
 <section>
-  <h2>系统架构</h2>
+  <h2>System Architecture</h2>
   <div class="diagram-card">
     <svg viewBox="0 0 1200 640" xmlns="http://www.w3.org/2000/svg" font-family="'JetBrains Mono',Consolas,monospace">
       <defs>
@@ -247,38 +247,38 @@
 
 <!-- ============ KEY NUMBERS ============ -->
 <section>
-  <h2>核心数字</h2>
+  <h2>Key Numbers</h2>
   <div class="cards">
     <div class="card">
-      <h3><span class="dot" style="background:var(--emerald)"></span>性能 (DL3DV @6 views)</h3>
+      <h3><span class="dot" style="background:var(--emerald)"></span>Performance (DL3DV @6 views)</h3>
       <ul>
-        <li>3DGS 输入 PSNR 17.65 (胜专用 3DGS-Enhancer 16.94)</li>
-        <li>mesh 输入 17.95 · 稀疏点云 17.74</li>
+        <li>3DGS input PSNR 17.65 (beats specialist 3DGS-Enhancer 16.94)</li>
+        <li>mesh input 17.95 · sparse points 17.74</li>
         <li>9 views: 3DGS 19.76 · mesh 19.86 · points 19.72</li>
       </ul>
     </div>
     <div class="card">
-      <h3><span class="dot" style="background:var(--violet)"></span>几何一致性 (Flow-DPO)</h3>
+      <h3><span class="dot" style="background:var(--violet)"></span>Geometric Consistency (Flow-DPO)</h3>
       <ul>
         <li>AUC@5°: 61.12 → 68.32 (+7.2%)</li>
-        <li>COLMAP 位姿恢复作 reward</li>
-        <li>零推理开销 (baked 进 LoRA)</li>
+        <li>COLMAP pose recovery as reward</li>
+        <li>zero inference cost (baked into LoRA)</li>
       </ul>
     </div>
     <div class="card">
-      <h3><span class="dot" style="background:var(--amber)"></span>数据与算力</h3>
+      <h3><span class="dot" style="background:var(--amber)"></span>Data & Compute</h3>
       <ul>
-        <li>20 对视频即有效 (vs prior 80K–150K 图像对)</li>
-        <li>LoRA rank-64, &lt;1% 参数, 1×H100</li>
-        <li>SFT 3000 iter + DPO 2000 iter</li>
+        <li>20 paired videos suffice (vs prior 80K–150K image pairs)</li>
+        <li>LoRA rank-64, &lt;1% params, 1×H100</li>
+        <li>SFT 3000 iters + DPO 2000 iters</li>
       </ul>
     </div>
     <div class="card">
-      <h3><span class="dot" style="background:var(--cyan)"></span>工程指标</h3>
+      <h3><span class="dot" style="background:var(--cyan)"></span>Engineering Metrics</h3>
       <ul>
         <li>mask: +1.3 dB PSNR</li>
-        <li>5 denoising steps: 31 s/61帧 (10× 加速)</li>
-        <li>不确定性: 25.7 vs 14.4 dB (自信 vs 不自信)</li>
+        <li>5 denoising steps: 31 s/61-frame (10× speedup)</li>
+        <li>uncertainty: 25.7 vs 14.4 dB (confident vs not)</li>
       </ul>
     </div>
   </div>
@@ -286,32 +286,32 @@
 
 <!-- ============ METHOD ============ -->
 <section>
-  <h2>方法: 两阶段轻量适配</h2>
+  <h2>Method: Two-Stage Lightweight Adaptation</h2>
 
-  <h3><span class="tag v">Stage I</span> 监督微调 (SFT) — 通道拼接 + LoRA</h3>
-  <div class="formula"><span class="lbl">rectified flow 加噪 + 通道拼接 conditioning</span>
+  <h3><span class="tag v">Stage I</span> Supervised fine-tuning (SFT) — channel concat + LoRA</h3>
+  <div class="formula"><span class="lbl">rectified flow noise + channel-concatenated conditioning</span>
     z_t = (1−t)·z_0 + t·ε, &nbsp; ε ~ N(0, I) &nbsp;&nbsp;→&nbsp;&nbsp; ẑ_t = [z_t ; z_cond ; m]
   </div>
-  <div class="formula"><span class="lbl">flow matching 目标 (模型预测速度场 v = ε − z_0)</span>
+  <div class="formula"><span class="lbl">flow matching objective (model predicts velocity field v = ε − z_0)</span>
     L_FM = E[ ‖ v − v_θ(ẑ_t, t) ‖² ]
   </div>
-  <p class="small muted">LoRA rank-64 更新 &lt;1% 参数, VAE 和基座冻结。任务比"从零生成视频"窄 — 只需学会 condition 在劣化输入上, 因此 20 对视频就够。</p>
+  <p class="small muted">LoRA rank-64 updates &lt;1% of parameters; VAE and base model frozen. The task is narrower than generating videos from scratch: the model only needs to learn to condition on the degraded input, so 20 paired videos suffice.</p>
 
-  <h3><span class="tag v">Mask</span> 该信谁, 该修谁</h3>
-  <p class="small">m=1 (训练视角): 保留不动, 防幻觉; m=0 (劣化帧): 修复。干净帧成为 anchor, 向相邻帧传播外观/光照/结构。无 mask 时模型分不清干净帧与轻度劣化帧, PSNR −1.3 dB。</p>
+  <h3><span class="tag v">Mask</span> What to trust, what to fix</h3>
+  <p class="small">m=1 (training views): keep untouched, prevents hallucination; m=0 (degraded frames): refine. Clean frames become anchors that propagate appearance, lighting and structure to neighbors. Without the mask the model cannot distinguish already-clean frames from mildly degraded ones, costing 1.3 dB PSNR.</p>
 
-  <h3><span class="tag r">Stage II</span> Flow-DPO — 位姿精度作 reward</h3>
-  <div class="formula"><span class="lbl">偏好优化 (Δ = 当前模型与 SFT reference 在流速预测上的 L2 差)</span>
+  <h3><span class="tag r">Stage II</span> Flow-DPO — pose accuracy as reward</h3>
+  <div class="formula"><span class="lbl">preference optimization (Δ = L2 gap in velocity prediction between current model and SFT reference)</span>
     L_DPO = −E[ log σ( −β/2 · (Δ_w − Δ_l) ) ]
   </div>
-  <p class="small muted">reward = COLMAP (SuperPoint + LightGlue) 从输出恢复的相机位姿 AUC@5°; 每个场景 5 seeds 采样, 保留 AUC gap ≥ 0.2 的配对。解决"单帧合理但跨视图不一致"的幻觉。AUC@5° 61.1 → 68.3, PSNR 17.51 → 17.65, 零推理开销。</p>
+  <p class="small muted">reward = camera pose AUC@5° recovered by COLMAP (SuperPoint + LightGlue) from model outputs; 5 seeds sampled per scene, pairs kept when AUC gap ≥ 0.2. Fixes the "plausible per-frame but inconsistent across views" hallucination. AUC@5° 61.1 → 68.3, PSNR 17.51 → 17.65, zero inference cost.</p>
 </section>
 
 <!-- ============ EXPERIMENTS ============ -->
 <section>
-  <h2>实验结果</h2>
+  <h2>Experimental Results</h2>
 
-  <h3>DL3DV 对比 (FixAnything 单模型, 四种输入)</h3>
+  <h3>DL3DV Comparison (FixAnything single model, four inputs)</h3>
   <table>
     <tr><th>Method</th><th class="num">3v PSNR</th><th class="num">3v LPIPS</th><th class="num">6v PSNR</th><th class="num">6v LPIPS</th><th class="num">9v PSNR</th><th class="num">9v LPIPS</th></tr>
     <tr><td>3DGS (sparse)</td><td class="num">10.97</td><td class="num">0.567</td><td class="num">13.34</td><td class="num">0.498</td><td class="num">14.99</td><td class="num">0.446</td></tr>
@@ -321,33 +321,33 @@
     <tr><td>Difix3D+</td><td class="num">12.37</td><td class="num">0.512</td><td class="num">14.41</td><td class="num">0.400</td><td class="num">16.39</td><td class="num">0.330</td></tr>
     <tr><td><b>FixAnything w/ 3DGS</b></td><td class="num best">15.18</td><td class="num best">0.408</td><td class="num best">17.65</td><td class="num best">0.289</td><td class="num best">19.76</td><td class="num best">0.269</td></tr>
     <tr><td>FixAnything w/ mesh</td><td class="num best">15.74</td><td class="num best">0.366</td><td class="num best">17.95</td><td class="num best">0.269</td><td class="num best">19.86</td><td class="num best">0.233</td></tr>
-    <tr><td>FixAnything w/ 稀疏点云</td><td class="num">15.52</td><td class="num">0.381</td><td class="num">17.74</td><td class="num">0.271</td><td class="num">19.72</td><td class="num">0.241</td></tr>
+    <tr><td>FixAnything w/ sparse points</td><td class="num">15.52</td><td class="num">0.381</td><td class="num">17.74</td><td class="num">0.271</td><td class="num">19.72</td><td class="num">0.241</td></tr>
   </table>
-  <div class="note"><b>读表:</b> ①3DGS 输入全面超过为 3DGS 定制的专用管线 (3DGS-Enhancer / Xu et al. / Difix3D+); ②mesh 输入最好, 稀疏 COLMAP 点云几乎持平 — 输入视觉信息远少于 3DGS 也能修到相当质量; ③"渲染主要起结构脚手架作用, 视频先验负责填内容"。</div>
+  <div class="note"><b>How to read:</b> ① With 3DGS input, FixAnything beats the specialist pipelines built for 3DGS (3DGS-Enhancer / Xu et al. / Difix3D+); ② mesh input is best and sparse COLMAP points are nearly as good, despite far less visual information — the render mainly acts as a structural scaffold and the video prior fills in content; ③ regularization-based sparse methods (RegNeRF/FreeNeRF/DNGaussian) improve geometry but cannot complete content in under-observed regions.</div>
 
-  <h3>消融 (DL3DV, 6 views)</h3>
+  <h3>Ablations (DL3DV, 6 views)</h3>
   <div class="two-col">
     <div>
-      <h3>Flow-DPO 的贡献</h3>
+      <h3>Flow-DPO contribution</h3>
       <table>
         <tr><th>Method</th><th class="num">PSNR↑</th><th class="num">SSIM↑</th><th class="num">LPIPS↓</th><th class="num">AUC@5°↑</th></tr>
         <tr><td>SFT only</td><td class="num">17.51</td><td class="num">0.554</td><td class="num">0.296</td><td class="num">61.12</td></tr>
         <tr><td><b>+DPO</b></td><td class="num best">17.65</td><td class="num best">0.561</td><td class="num best">0.289</td><td class="num best">68.32</td></tr>
       </table>
-      <p class="small muted">图像指标温和提升, 主要增益在几何一致性 (+7.2% AUC), 零推理成本。</p>
+      <p class="small muted">Image metrics improve modestly; the main gain is geometric consistency (+7.2% AUC), at zero inference cost.</p>
     </div>
     <div>
-      <h3>Mask 的贡献</h3>
+      <h3>Mask contribution</h3>
       <table>
         <tr><th>Variant</th><th class="num">PSNR↑</th><th class="num">SSIM↑</th><th class="num">LPIPS↓</th></tr>
         <tr><td>No mask</td><td class="num">16.37</td><td class="num">0.525</td><td class="num">0.311</td></tr>
         <tr><td><b>With mask</b></td><td class="num best">17.65</td><td class="num best">0.561</td><td class="num best">0.289</td></tr>
       </table>
-      <p class="small muted">+1.3 dB PSNR — 模型能区分"本来就干净"与"需修复"的帧。</p>
+      <p class="small muted">+1.3 dB PSNR — the model can tell "already clean" from "needs fixing".</p>
     </div>
   </div>
 
-  <h3>数据效率 & 推理速度</h3>
+  <h3>Data Efficiency & Inference Speed</h3>
   <div class="two-col">
     <div>
       <table>
@@ -356,7 +356,7 @@
         <tr><td>100</td><td class="num">17.45</td><td class="num">0.556</td><td class="num">0.292</td></tr>
         <tr><td>500</td><td class="num best">17.65</td><td class="num best">0.561</td><td class="num best">0.289</td></tr>
       </table>
-      <p class="small muted">20 对即有效, 100 对后边际收益递减。</p>
+      <p class="small muted">20 pairs already effective, diminishing returns past 100.</p>
     </div>
     <div>
       <table>
@@ -366,51 +366,51 @@
         <tr><td>25</td><td class="num">17.75</td><td class="num">155</td></tr>
         <tr><td>50</td><td class="num">17.65</td><td class="num">309</td></tr>
       </table>
-      <p class="small muted">5 steps 足够, 10× 加速 (61帧@480×832, H100)。</p>
+      <p class="small muted">5 steps suffice, 10× speedup (61-frame @ 480×832, H100).</p>
     </div>
   </div>
 
-  <div class="note"><b>诚实读数:</b> ①评估限于 DL3DV (航拍/大场景为主) 的 20 个 held-out 场景, 室内小物体覆盖少; ②跨数据集 (MipNeRF-360/LLFF) 结果只在 supplementary; ③不确定性分析是 preliminary (5 seeds 简单 std), 无系统校准。对外陈述用"3DGS 输入 6 views PSNR 17.65 超过专用管线 + AUC@5° 提升 7.2% + 20 对视频即可训练"。</div>
+  <div class="note"><b>Honest reading:</b> ① Evaluation is limited to 20 held-out DL3DV scenes (aerial / large-scale scenes dominate), indoor small-object coverage is thin; ② Cross-dataset results (MipNeRF-360 / LLFF) live in the supplementary only; ③ The uncertainty analysis is preliminary (simple 5-seed std, no systematic calibration). For external claims use: "3DGS input 6-view PSNR 17.65 beats specialist pipelines + AUC@5° up 7.2% + trains on 20 paired videos".</div>
 </section>
 
 <!-- ============ COMPARISON ============ -->
 <section>
-  <h2>与相关工作对比</h2>
+  <h2>Comparison with Related Work</h2>
   <table>
-    <tr><th>方法</th><th>表示</th><th>机制</th><th>数据量</th><th>3D 一致</th><th>代码</th></tr>
-    <tr><td>Nerfbusters</td><td>NeRF</td><td>3D diffusion 正则化几何</td><td>大</td><td>隐式</td><td>✓</td></tr>
-    <tr><td>ReconFusion</td><td>NeRF</td><td>PixelNeRF 条件逐视角生成</td><td>大</td><td>隐式</td><td>✓</td></tr>
-    <tr><td>Difix3D+</td><td>图像</td><td>参考视角单步 image diffusion</td><td>80K+ 对</td><td>弱 (逐图)</td><td>✓</td></tr>
-    <tr><td>3DGS-Enhancer</td><td>3DGS</td><td>视频 LDM + 定制时空 decoder</td><td>150K 对</td><td>中等</td><td>✓</td></tr>
-    <tr><td>ViewCrafter / GEN3C</td><td>点云</td><td>相机控制视频生成 (显式 SE(3))</td><td>大</td><td>中等</td><td>✓</td></tr>
-    <tr><td>FlowR</td><td>稀疏重建</td><td>多视角 flow matching</td><td>大</td><td>中等</td><td>✗</td></tr>
-    <tr><td>Epipolar-DPO / VideoGPA</td><td>T2V/I2V</td><td>极几何/重建先验 DPO (concurrent)</td><td>—</td><td>强</td><td>部分</td></tr>
-    <tr><td><b>FixAnything</b></td><td><b>4 种通用</b></td><td><b>Wan2.1 + LoRA + mask + Flow-DPO</b></td><td><b>20–500 视频</b></td><td><b>强 (位姿 reward)</b></td><td>✗ coming soon</td></tr>
+    <tr><th>Method</th><th>Representation</th><th>Mechanism</th><th>Data</th><th>3D Consistency</th><th>Code</th></tr>
+    <tr><td>Nerfbusters</td><td>NeRF</td><td>3D diffusion regularization of geometry</td><td>large</td><td>implicit</td><td>✓</td></tr>
+    <tr><td>ReconFusion</td><td>NeRF</td><td>PixelNeRF-conditioned per-view generation</td><td>large</td><td>implicit</td><td>✓</td></tr>
+    <tr><td>Difix3D+</td><td>image</td><td>single-step image diffusion conditioned on reference view</td><td>80K+ pairs</td><td>weak (per-image)</td><td>✓</td></tr>
+    <tr><td>3DGS-Enhancer</td><td>3DGS</td><td>video LDM + custom spatiotemporal decoder</td><td>150K pairs</td><td>medium</td><td>✓</td></tr>
+    <tr><td>ViewCrafter / GEN3C</td><td>points</td><td>camera-controlled video generation (explicit SE(3))</td><td>large</td><td>medium</td><td>✓</td></tr>
+    <tr><td>FlowR</td><td>sparse recon</td><td>multi-view flow matching</td><td>large</td><td>medium</td><td>✗</td></tr>
+    <tr><td>Epipolar-DPO / VideoGPA</td><td>T2V/I2V</td><td>epipolar/reconstruction-prior DPO (concurrent)</td><td>—</td><td>strong</td><td>partial</td></tr>
+    <tr><td><b>FixAnything</b></td><td><b>4 general</b></td><td><b>Wan2.1 + LoRA + mask + Flow-DPO</b></td><td><b>20–500 videos</b></td><td><b>strong (pose reward)</b></td><td>✗ coming soon</td></tr>
   </table>
-  <p class="small muted">定位: 第一个"通用"渲染清理模型 — 不针对特定表示、无架构改动、数据需求低两个数量级。三个贡献: 表示无关的形式化、mask-aware conditioning、几何一致性偏好优化。</p>
+  <p class="small muted">Positioning: the first "generalist" rendering-cleanup model — no representation-specific architecture, no redesign, two orders of magnitude less data. Three contributions: representation-agnostic formulation, mask-aware conditioning, geometry-as-preference optimization.</p>
 </section>
 
 <!-- ============ LIMITS ============ -->
 <section>
-  <h2>局限性与工程注意</h2>
-  <div class="limitation"><b>论文自认:</b> ①幻觉不可避免 — 模型必须在未观测区域"发明"内容, 只在"与已有观测矛盾"时才算失败; ②不确定性分析是 preliminary (5 seeds std), 无系统校准; ③长轨迹靠 61 帧分块, chunk 边界一致性靠共享 anchor, 有理论限制; ④评估以 DL3DV 大场景为主。</div>
-  <div class="limitation"><b>工程视角 (我的补充):</b> ①代码未开源 (Coming Soon) — 与 PhysGS 同样问题, 复现要等官方 release; ②推理开销 — 31s/61帧 (H100, 5 steps), 视频扩散模型注定是离线预处理, 不是在线渲染; ③依赖 mask 标注 — 要知道训练视角集合与位姿, 位姿噪声会污染 mask; ④输出分辨率 480×832, 对需要高分辨率渲染的任务可能不够; ⑤20 对视频是"能用"不是"好用", 500 对才有完整效果。</div>
+  <h2>Limitations and Engineering Notes</h2>
+  <div class="limitation"><b>Stated by the paper:</b> ① Hallucination is unavoidable — the model must invent content in unobserved regions; it only fails when invented content contradicts existing observations; ② The uncertainty analysis is preliminary (5-seed std, no systematic calibration); ③ Long trajectories are processed in 61-frame chunks, chunk-boundary consistency relies on shared anchors and has theoretical limits; ④ Evaluation centers on DL3DV large scenes.</div>
+  <div class="limitation"><b>Engineering view (our additions):</b> ① Code not released (coming soon) — same issue as PhysGS, reproduction waits for the official release; ② Inference cost — 31 s per 61-frame clip (H100, 5 steps); a video diffusion model is inherently offline preprocessing, not online rendering; ③ Relies on mask annotation — you need to know the training-view set and poses; pose noise corrupts the mask; ④ Output resolution 480×832 may be insufficient for tasks needing high-res renders; ⑤ "20 paired videos" is workable, not optimal — full quality needs 500.</div>
 </section>
 
 <!-- ============ FOR US ============ -->
 <section>
-  <h2>对机器人项目的意义</h2>
-  <div class="takeaway"><b>补 GaussGym 渲染质量短板:</b> GaussGym 用 3DGS 渲染器训练机器人, 稀疏扫描的 floaters 会污染视觉策略训练。FixAnything (3DGS 输入版, PSNR 17.65 @6 views) 可做离线清洗: 扫描 → 3DGS → 渲染轨迹 → 修复 → 干净训练视觉流。</div>
-  <div class="takeaway"><b>稀疏点云路线可能跳过中间重建:</b> FixAnything 证明 COLMAP 稀疏点云 + 视频先验就能出高质量渲染 (19.72 PSNR @9 views)。我们的扫描管线可以渲染点云轨迹 + 生成式修复, 省掉 NKSR mesh / 3DGS 训练 — 与 [[physical-property-estimation-from-scans]] 的结论呼应。</div>
-  <div class="takeaway"><b>不确定性 = 补扫引导:</b> 5-seed std 标出"模型在编"的区域 (弱观测区域), 指导哪里再多拍几张照片, 或把高不确定区域排除出策略训练采样。</div>
-  <div class="takeaway"><b>与 PhysGS 互补:</b> PhysGS 需要干净的 3DGS 重建才能准确估计物理属性; FixAnything 清洗后的渲染/重建可作 PhysGS 的输入增强。三篇综述 (GaussGym → PhysGS → FixAnything) 构成"场景获取 → 物理标注 → 渲染质量"的完整闭环。</div>
-  <div class="takeaway"><b>落地路径:</b> 等代码开源 → 用 GaussGym 扫描输出 (COLMAP 点云或 3DGS 渲染) 跑离线清洗 → 对比清洗前后策略训练表现。注意 31s/61帧 意味着批量离线, 不是实时。</div>
+  <h2>Implications for the Robot Project</h2>
+  <div class="takeaway"><b>Fills GaussGym's rendering-quality gap:</b> GaussGym trains robots with a 3DGS renderer; floaters from sparse scans pollute visual policy training. FixAnything (3DGS input, PSNR 17.65 @6 views) provides offline cleanup: scan → 3DGS → render trajectory → fix → clean visual stream for training.</div>
+  <div class="takeaway"><b>The sparse-point route may skip intermediate reconstruction:</b> FixAnything shows COLMAP sparse points + video prior produce high-quality renders (19.72 PSNR @9 views). Our capture pipeline can render point trajectories and apply generative cleanup, skipping NKSR mesh / 3DGS training entirely — consistent with the conclusions in our physical-property-estimation review.</div>
+  <div class="takeaway"><b>Uncertainty = rescan guidance:</b> 5-seed std marks the regions where the model is inventing (weakly observed regions), guiding where to capture more photos, or excluding high-uncertainty regions from policy training sampling.</div>
+  <div class="takeaway"><b>Complements PhysGS:</b> PhysGS needs clean 3DGS reconstruction for accurate physical property estimation; FixAnything-cleaned renders/reconstructions can serve as enhanced input. The three reviews (GaussGym → PhysGS → FixAnything) form a closed loop: scene acquisition → physics labeling → rendering quality.</div>
+  <div class="takeaway"><b>Adoption path:</b> wait for the code release → run offline cleanup on GaussGym scan outputs (COLMAP points or 3DGS renders) → compare policy training before/after. Note that 31 s per 61 frames means batch offline, not real time.</div>
 </section>
 
 </main>
 
 <footer>
-  FixAnything: 3D-Consistent Rendering Refinement via Video Generative Priors · Vuong, Ramanan, Narasimhan (CMU) · ECCV 2026 · arXiv:2608.23549 · 报告入库: 3d-sim-wiki concepts/fixanything.md · 2026-08-31
+  FixAnything: 3D-Consistent Rendering Refinement via Video Generative Priors · Vuong, Ramanan, Narasimhan (CMU) · ECCV 2026 · arXiv:2608.23549 · Stored in 3d-sim-wiki concepts/fixanything.md · 2026-08-31
 </footer>
 
 </body>
