@@ -1,10 +1,10 @@
 ---
 title: "扫描场景自动物理属性标注（摩擦/粗糙度）"
 created: 2026-08-24
-updated: 2026-08-24
+updated: 2026-08-31
 type: concept
 tags: [gaussian-splatting, physics, rendering, robot-env, reference]
-sources: [raw/articles/physgs-website.md, raw/articles/friction-from-vision-brandao-2016.md, raw/articles/vlm-friction-wip-arxiv-2409-09845.md, raw/articles/sim-anything-arxiv-2411-12789.md, raw/papers/gaussgym-arxiv-2510-15352.md]
+sources: [raw/papers/physgs-arxiv-2511-18570.md, raw/articles/physgs-website.md, raw/articles/friction-from-vision-brandao-2016.md, raw/articles/vlm-friction-wip-arxiv-2409-09845.md, raw/articles/sim-anything-arxiv-2411-12789.md, raw/papers/gaussgym-arxiv-2510-15352.md]
 confidence: medium
 ---
 
@@ -33,7 +33,7 @@ confidence: medium
 
 ### 2.3 3DGS 物理属性估计（PhysGS, CVPR 2026, 最贴近我们需求）
 
-UMD 的 Samarth Chopra 等人工作，Bayesian 推断的 3DGS 扩展，是当前唯一在 3DGS 表示上做稠密逐点物理属性估计的方法：
+UMD 的 Samarth Chopra 等人工作，Bayesian 推断的 3DGS 扩展，是当前唯一在 3DGS 表示上做稠密逐点物理属性估计的方法。**完整 literature review 报告见 [[physgs|PhysGS: Bayesian 3DGS 逐点物理属性估计]]**（含方法公式、实验数值、对比、局限性分析），本节只留摘要：
 
 - 流程：SAM 做部件级分割 → VLM 对每个部件产出材质标签、密度估计、置信度（多视图）→ Bayesian inference 融合观测 → 得到逐材质属性分布 → 传播到 3D 高斯场得到逐点属性。
 - 输出：friction（摩擦）、hardness（硬度）、density（密度）、stiffness（刚度）、mass（质量），以及 aleatoric + epistemic 不确定性。
@@ -78,6 +78,8 @@ UMD 的 Samarth Chopra 等人工作，Bayesian 推断的 3DGS 扩展，是当前
 ## 参考来源
 
 - PhysGS 官网：raw/articles/physgs-website.md
+- PhysGS 论文全文：raw/papers/physgs-arxiv-2511-18570.md
+- PhysGS 完整报告：[[physgs]]
 - Friction from Vision (Brandao 2016)：raw/articles/friction-from-vision-brandao-2016.md
 - VLM 摩擦估计 (2409.09845)：raw/articles/vlm-friction-wip-arxiv-2409-09845.md
 - Sim Anything (2411.12789)：raw/articles/sim-anything-arxiv-2411-12789.md

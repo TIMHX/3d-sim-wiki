@@ -1,0 +1,80 @@
+%% PhysGS: Bayesian-Inferred Gaussian Splatting for Physical Property Estimation
+%% presentation panorama — CVPR 2026 (arXiv:2511.18570)
+flowchart TD
+    T["PhysGS: Bayesian 3DGS 逐点物理属性估计"]
+
+    subgraph SG_IN["Input"]
+        IN1["Multi-view RGB Images"]
+        IN2["GPT-5 VLM (vision-language prior)"]
+    end
+
+    subgraph SG_SEG["Segmentation (SAM)"]
+        SAM1["Whole / Part / Sub-part masks"]
+        SAM2["IoU + stability filtering"]
+    end
+
+    subgraph SG_VLM["VLM Prompting"]
+        VP1["3-image triplet: full + mask overlay + isolated part"]
+        VP2["Material label + property + confidence p in [0,1]"]
+    end
+
+    subgraph SG_BAYES["Bayesian Inference over Splats"]
+        B1["Dirichlet-Categorical (discrete material)"]
+        B2["Confidence-weighted moments (continuous property)"]
+        B3["NIG prior: aleatoric + epistemic uncertainty"]
+        B4["Cross-view posterior refinement"]
+    end
+
+    subgraph SG_GS["Semantic 3DGS"]
+        GS1["Material legend recolor"]
+        GS2["Splatfacto-big (Nerfstudio), 20K iter"]
+        GS3["Per-point property field"]
+    end
+
+    subgraph SG_OUT["Outputs"]
+        O1["Friction / Hardness / Stiffness / Density / Mass"]
+        O2["Aleatoric + epistemic uncertainty maps"]
+    end
+
+    subgraph SG_USE["For Our Project"]
+        U1["Map to PMAT__muXXX friction profiles"]
+        U2["Active sampling: where to measure friction"]
+        U3["Complement GaussGym scene pipeline"]
+    end
+
+    T --> IN1
+    IN1 --> SAM1
+    SAM1 --> SAM2
+    SAM2 --> VP1
+    VP1 --> VP2
+    IN2 -.-> VP2
+    VP2 --> B1
+    VP2 --> B2
+    B1 --> B3
+    B2 --> B3
+    B3 --> B4
+    B4 --> GS1
+    GS1 --> GS2
+    GS2 --> GS3
+    GS3 --> O1
+    GS3 --> O2
+    O1 --> U1
+    O2 --> U2
+    U1 --> U3
+
+    classDef inp fill:#c8e6c9,stroke:#388e3c;
+    classDef seg fill:#fff9c4,stroke:#fbc02d;
+    classDef vlm fill:#b3e5fc,stroke:#0277bd;
+    classDef bay fill:#e1bee7,stroke:#8e24aa;
+    classDef gs fill:#ffe0b2,stroke:#f57c00;
+    classDef out fill:#ffcdd2,stroke:#c62828;
+    classDef use fill:#b2dfdb,stroke:#00796b;
+    classDef title fill:#eceff1,stroke:#455a64;
+    class IN1,IN2 inp;
+    class SAM1,SAM2 seg;
+    class VP1,VP2 vlm;
+    class B1,B2,B3,B4 bay;
+    class GS1,GS2,GS3 gs;
+    class O1,O2 out;
+    class U1,U2,U3 use;
+    class T title;
