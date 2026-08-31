@@ -27,6 +27,23 @@ flowchart TD
         B5["streaming: O(1) closed-form updates · no history · cross-view fusion by material-name grouping"]
     end
 
+    subgraph SG_FLOW["Single Observation Data Flow: one mask → one prediction"]
+        F0["O_m = (c_m, p_m, ψ_m)  from one mask in one view"]
+        F1["Discrete branch: Dirichlet vote ᾱ_{c_m} += λ·p_m"]
+        F2["Continuous branch: accumulators W+=p_m, S+=p_m·ψ_m, Q+=p_m·ψ_m²"]
+        F3["Material weight w_{c_m} = ᾱ_{c_m}/Σⱼᾱⱼ"]
+        F4["Per-material Gaussian N(μ_{c_m}, σ²_{c_m})"]
+        F5["Gaussian Mixture (Eq. 11): f(ψ|Z,α) = Σᵢ wᵢ·N(μᵢ, σᵢ²)"]
+        F6["MMSE point estimate = Σ wᵢ μᵢ  (single representative value)"]
+        F0 --> F1
+        F0 --> F2
+        F1 --> F3
+        F2 --> F4
+        F3 --> F5
+        F4 --> F5
+        F5 --> F6
+    end
+
     subgraph SG_GS["Semantic 3DGS (per-material properties propagated to points)"]
         GS1["Material legend recolor: each material → unique color"]
         GS2["Splat training: splatfacto-big (Nerfstudio), 20K iter, RTX A5000"]
@@ -53,10 +70,11 @@ flowchart TD
     VP1 --> VP2
     VP2 --> VP3
     IN2 -.-> VP2
-    VP3 --> B1
-    VP3 --> B2
-    B1 --> B4
-    B2 --> B4
+    VP3 --> F0
+    F6 --> B1
+    F6 --> B2
+    B1 --> B3
+    B2 --> B3
     B3 --> B4
     B4 --> B5
     B5 --> GS1
@@ -74,6 +92,7 @@ flowchart TD
     classDef seg fill:#fff9c4,stroke:#fbc02d;
     classDef vlm fill:#b3e5fc,stroke:#0277bd;
     classDef bay fill:#e1bee7,stroke:#8e24aa;
+    classDef flow fill:#d1c4e9,stroke:#5e35b1;
     classDef gs fill:#ffe0b2,stroke:#f57c00;
     classDef out fill:#ffcdd2,stroke:#c62828;
     classDef use fill:#b2dfdb,stroke:#00796b;
@@ -82,6 +101,7 @@ flowchart TD
     class SAM1,SAM2 seg;
     class VP1,VP2,VP3 vlm;
     class B1,B2,B3,B4,B5 bay;
+    class F0,F1,F2,F3,F4,F5,F6 flow;
     class GS1,GS2,GS3,GS4 gs;
     class O1,O2,O3 out;
     class U1,U2,U3 use;
