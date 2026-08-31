@@ -59,7 +59,7 @@
     padding: 20px;
     overflow-x: auto;
   }
-  .diagram-card svg { display: block; margin: 0 auto; min-width: 900px; }
+  .diagram-card svg { display: block; margin: 0 auto; min-width: 1000px; }
   .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 20px; }
   .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px; }
   .card h3 { font-size: 13px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
@@ -97,7 +97,7 @@
   <h1 style="margin-top:10px">PhysGS: Bayesian-Inferred Gaussian Splatting<br>for Physical Property Estimation</h1>
   <div class="sub">Estimate per-point physical properties (friction, hardness, stiffness, density, mass) on 3DGS from multi-view RGB plus VLM priors, with calibrated uncertainty</div>
   <div class="meta">
-    <span class="tag">CVPR 2026</span><span class="tag g">arXiv:2511.18570</span><span class="tag v">UMD</span><span class="tag a">Code not released</span>
+    <span class="tag">CVPR 2026</span><span class="tag g">arXiv:2511.18570</span><span class="tag v">UMD</span><span class="tag a">Code: MIT open-source</span>
     Chopra · Liang · Seneviratne · Manocha — University of Maryland, College Park
   </div>
 </header>
@@ -108,7 +108,7 @@
 <section>
   <h2>System Architecture</h2>
   <div class="diagram-card">
-    <svg viewBox="0 0 1200 640" xmlns="http://www.w3.org/2000/svg" font-family="'JetBrains Mono',Consolas,monospace">
+    <svg viewBox="0 0 1200 780" xmlns="http://www.w3.org/2000/svg" font-family="'JetBrains Mono',Consolas,monospace">
       <defs>
         <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
           <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/>
@@ -120,139 +120,177 @@
           <path d="M 0 0 L 10 5 L 0 10 z" fill="#22d3ee"/>
         </marker>
       </defs>
-      <rect width="1200" height="640" fill="url(#grid)"/>
+      <rect width="1200" height="760" fill="url(#grid)"/>
 
-      <!-- TITLE -->
-      <text x="600" y="30" text-anchor="middle" fill="#e2e8f0" font-size="15" font-weight="bold">PhysGS: Bayesian Inference over Gaussian Splats</text>
+      <text x="600" y="28" text-anchor="middle" fill="#e2e8f0" font-size="15" font-weight="bold">PhysGS: Bayesian Inference over Gaussian Splats</text>
 
-      <!-- ===== INPUT ===== -->
+      <!-- ===== ROW 1: INPUT PIPELINE ===== -->
       <g>
-        <rect x="40" y="60" width="240" height="110" rx="8" fill="#0f172a" stroke="#34d399" stroke-width="1.5"/>
-        <rect x="40" y="60" width="240" height="110" rx="8" fill="rgba(6,78,59,0.4)" stroke="#34d399" stroke-width="1.5"/>
-        <text x="160" y="84" text-anchor="middle" fill="#34d399" font-size="12" font-weight="bold">Input</text>
-        <text x="160" y="108" text-anchor="middle" fill="#e2e8f0" font-size="10">Multi-view RGB images</text>
-        <text x="160" y="124" text-anchor="middle" fill="#94a3b8" font-size="9">+ camera info</text>
-        <text x="160" y="148" text-anchor="middle" fill="#94a3b8" font-size="9">GPT-5 VLM as prior</text>
+        <rect x="40" y="52" width="200" height="96" rx="8" fill="#0f172a" stroke="#34d399" stroke-width="1.5"/>
+        <rect x="40" y="52" width="200" height="96" rx="8" fill="rgba(6,78,59,0.4)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="140" y="74" text-anchor="middle" fill="#34d399" font-size="11" font-weight="bold">Input</text>
+        <text x="140" y="96" text-anchor="middle" fill="#e2e8f0" font-size="9.5">Multi-view RGB</text>
+        <text x="140" y="112" text-anchor="middle" fill="#94a3b8" font-size="8.5">N views of same scene</text>
+        <text x="140" y="128" text-anchor="middle" fill="#94a3b8" font-size="8.5">+ camera info</text>
       </g>
 
-      <!-- ===== SAM ===== -->
       <g>
-        <rect x="340" y="60" width="240" height="110" rx="8" fill="#0f172a" stroke="#fbbf24" stroke-width="1.5"/>
-        <rect x="340" y="60" width="240" height="110" rx="8" fill="rgba(120,53,15,0.3)" stroke="#fbbf24" stroke-width="1.5"/>
-        <text x="460" y="84" text-anchor="middle" fill="#fbbf24" font-size="12" font-weight="bold">SAM Segmentation</text>
-        <text x="460" y="108" text-anchor="middle" fill="#e2e8f0" font-size="10">Whole / Part / Sub-part masks</text>
-        <text x="460" y="124" text-anchor="middle" fill="#94a3b8" font-size="9">Hierarchical material decomposition</text>
-        <text x="460" y="148" text-anchor="middle" fill="#94a3b8" font-size="9">IoU + stability filtering</text>
+        <rect x="280" y="52" width="200" height="96" rx="8" fill="#0f172a" stroke="#fbbf24" stroke-width="1.5"/>
+        <rect x="280" y="52" width="200" height="96" rx="8" fill="rgba(120,53,15,0.3)" stroke="#fbbf24" stroke-width="1.5"/>
+        <text x="380" y="74" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="bold">SAM Segmentation</text>
+        <text x="380" y="96" text-anchor="middle" fill="#e2e8f0" font-size="9.5">whole / part / sub-part</text>
+        <text x="380" y="112" text-anchor="middle" fill="#94a3b8" font-size="8.5">per view, per image</text>
+        <text x="380" y="128" text-anchor="middle" fill="#94a3b8" font-size="8.5">IoU + stability filter</text>
       </g>
 
-      <!-- ===== VLM PROMPT ===== -->
       <g>
-        <rect x="640" y="60" width="240" height="110" rx="8" fill="#0f172a" stroke="#22d3ee" stroke-width="1.5"/>
-        <rect x="640" y="60" width="240" height="110" rx="8" fill="rgba(8,51,68,0.4)" stroke="#22d3ee" stroke-width="1.5"/>
-        <text x="760" y="84" text-anchor="middle" fill="#22d3ee" font-size="12" font-weight="bold">VLM Prompting</text>
-        <text x="760" y="108" text-anchor="middle" fill="#e2e8f0" font-size="10">3-image triplet per part</text>
-        <text x="760" y="124" text-anchor="middle" fill="#94a3b8" font-size="9">full + mask-overlay + isolated</text>
-        <text x="760" y="148" text-anchor="middle" fill="#94a3b8" font-size="9">→ material, property, confidence p</text>
+        <rect x="520" y="52" width="220" height="96" rx="8" fill="#0f172a" stroke="#22d3ee" stroke-width="1.5"/>
+        <rect x="520" y="52" width="220" height="96" rx="8" fill="rgba(8,51,68,0.4)" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="630" y="74" text-anchor="middle" fill="#22d3ee" font-size="11" font-weight="bold">VLM Prompting (GPT-5)</text>
+        <text x="630" y="96" text-anchor="middle" fill="#e2e8f0" font-size="9.5">3-image triplet per part</text>
+        <text x="630" y="112" text-anchor="middle" fill="#94a3b8" font-size="8.5">full + mask-overlay + isolated</text>
+        <text x="630" y="128" text-anchor="middle" fill="#94a3b8" font-size="8.5">caption · material · property · p</text>
       </g>
 
-      <!-- ===== BAYESIAN CORE ===== -->
       <g>
-        <rect x="940" y="60" width="220" height="110" rx="8" fill="#0f172a" stroke="#a78bfa" stroke-width="2"/>
-        <rect x="940" y="60" width="220" height="110" rx="8" fill="rgba(76,29,149,0.4)" stroke="#a78bfa" stroke-width="2"/>
-        <text x="1050" y="84" text-anchor="middle" fill="#a78bfa" font-size="12" font-weight="bold">Bayesian Inference</text>
-        <text x="1050" y="108" text-anchor="middle" fill="#e2e8f0" font-size="10">Dirichlet–Categorical</text>
-        <text x="1050" y="124" text-anchor="middle" fill="#94a3b8" font-size="9">material class posterior</text>
-        <text x="1050" y="146" text-anchor="middle" fill="#e2e8f0" font-size="10">Normal–Inverse–Gamma</text>
-        <text x="1050" y="162" text-anchor="middle" fill="#94a3b8" font-size="9">property + aleatoric/epistemic</text>
+        <rect x="780" y="52" width="380" height="96" rx="8" fill="#0f172a" stroke="#94a3b8" stroke-width="1.5"/>
+        <rect x="780" y="52" width="380" height="96" rx="8" fill="rgba(30,41,59,0.5)" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="970" y="74" text-anchor="middle" fill="#94a3b8" font-size="11" font-weight="bold">Confidence-Weighted Observations</text>
+        <text x="970" y="98" text-anchor="middle" fill="#e2e8f0" font-size="10.5">O_m = (c_m, p_m, ψ_m)</text>
+        <text x="970" y="116" text-anchor="middle" fill="#94a3b8" font-size="8.5">class · VLM confidence · property value</text>
+        <text x="970" y="132" text-anchor="middle" fill="#94a3b8" font-size="8.5">one observation per mask per view</text>
+        <text x="970" y="145" text-anchor="middle" fill="#fb7185" font-size="8.5">note: cross-view grouping is BY MATERIAL NAME</text>
       </g>
 
-      <!-- arrows row 1 -->
-      <line x1="280" y1="115" x2="338" y2="115" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
-      <line x1="580" y1="115" x2="638" y2="115" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
-      <line x1="880" y1="115" x2="938" y2="115" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <line x1="240" y1="100" x2="278" y2="100" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <line x1="480" y1="100" x2="518" y2="100" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <line x1="740" y1="100" x2="778" y2="100" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
 
-      <!-- ===== OBSERVATIONS ===== -->
+      <!-- ===== ROW 2: BAYESIAN INFERENCE (2x2 detailed) ===== -->
       <g>
-        <rect x="40" y="250" width="400" height="100" rx="8" fill="#0f172a" stroke="#94a3b8" stroke-width="1.5"/>
-        <rect x="40" y="250" width="400" height="100" rx="8" fill="rgba(30,41,59,0.5)" stroke="#94a3b8" stroke-width="1.5"/>
-        <text x="240" y="274" text-anchor="middle" fill="#94a3b8" font-size="12" font-weight="bold">Confidence-Weighted Observations</text>
-        <text x="240" y="300" text-anchor="middle" fill="#e2e8f0" font-size="10.5">Oₘ = (cₘ, pₘ, ψₘ)</text>
-        <text x="240" y="318" text-anchor="middle" fill="#94a3b8" font-size="9">class · VLM confidence · property value</text>
-        <text x="240" y="336" text-anchor="middle" fill="#94a3b8" font-size="9">fused across multiple views</text>
+        <rect x="40" y="180" width="1120" height="252" rx="12" fill="none" stroke="#a78bfa" stroke-width="1.8" stroke-dasharray="6,4"/>
+        <text x="60" y="204" fill="#a78bfa" font-size="12" font-weight="bold">Bayesian Inference over Splats —  hierarchical posterior: p(z, ψ|Z) = p(ψ|z) · p(z|Z)</text>
+        <text x="60" y="222" fill="#94a3b8" font-size="9">streaming: O(1) closed-form updates per new view · no history storage · cross-view fusion by material-name grouping</text>
+
+        <!-- B1: Dirichlet-Categorical -->
+        <g>
+          <rect x="60" y="240" width="250" height="90" rx="8" fill="#0f172a" stroke="#a78bfa" stroke-width="1.5"/>
+          <rect x="60" y="240" width="250" height="90" rx="8" fill="rgba(76,29,149,0.35)" stroke="#a78bfa" stroke-width="1.5"/>
+          <text x="185" y="260" text-anchor="middle" fill="#a78bfa" font-size="10.5" font-weight="bold">1 · Dirichlet–Categorical</text>
+          <text x="185" y="278" text-anchor="middle" fill="#e2e8f0" font-size="9.5">material class posterior</text>
+          <text x="185" y="296" text-anchor="middle" fill="#c4b5fd" font-size="9.5">ᾱᵢ = αᵢ(0) + Σ_{cₘ=i} λ·pₘ</text>
+          <text x="185" y="314" text-anchor="middle" fill="#94a3b8" font-size="8.5">conjugate · closed form</text>
+        </g>
+        <text x="310" y="268" fill="#64748b" font-size="9">weight wᵢ = ᾱᵢ/Σⱼᾱⱼ</text>
+        <line x1="310" y1="285" x2="410" y2="285" stroke="#64748b" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+        <!-- B2: confidence-weighted moments -->
+        <g>
+          <rect x="412" y="240" width="250" height="90" rx="8" fill="#0f172a" stroke="#a78bfa" stroke-width="1.5"/>
+          <rect x="412" y="240" width="250" height="90" rx="8" fill="rgba(76,29,149,0.35)" stroke="#a78bfa" stroke-width="1.5"/>
+          <text x="537" y="260" text-anchor="middle" fill="#a78bfa" font-size="10.5" font-weight="bold">2 · Weighted Moments</text>
+          <text x="537" y="278" text-anchor="middle" fill="#e2e8f0" font-size="9.5">continuous property per material</text>
+          <text x="537" y="296" text-anchor="middle" fill="#c4b5fd" font-size="9.5">W=Σp · S=Σpψ · Q=Σpψ²</text>
+          <text x="537" y="314" text-anchor="middle" fill="#94a3b8" font-size="8.5">μᵢ=S/W · σᵢ²=Q/W−μᵢ²</text>
+        </g>
+        <text x="662" y="268" fill="#64748b" font-size="9">per-class Gaussian N(μᵢ,σᵢ²)</text>
+        <line x1="662" y1="285" x2="762" y2="285" stroke="#64748b" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+        <!-- B3: NIG uncertainty -->
+        <g>
+          <rect x="764" y="240" width="250" height="90" rx="8" fill="#0f172a" stroke="#a78bfa" stroke-width="1.5"/>
+          <rect x="764" y="240" width="250" height="90" rx="8" fill="rgba(76,29,149,0.35)" stroke="#a78bfa" stroke-width="1.5"/>
+          <text x="889" y="260" text-anchor="middle" fill="#a78bfa" font-size="10.5" font-weight="bold">3 · NIG Uncertainty</text>
+          <text x="889" y="278" text-anchor="middle" fill="#e2e8f0" font-size="9.5">Normal–Inverse–Gamma prior</text>
+          <text x="889" y="296" text-anchor="middle" fill="#c4b5fd" font-size="9">aleatoric: β̃/(ᾱ−1)</text>
+          <text x="889" y="312" text-anchor="middle" fill="#c4b5fd" font-size="9">epistemic: E[σ²]/κ̃</text>
+        </g>
+        <text x="1014" y="268" fill="#64748b" font-size="9">Var[ψ] = ale + epi</text>
+        <line x1="1014" y1="285" x2="1104" y2="285" stroke="#64748b" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+        <!-- B4: Gaussian mixture output -->
+        <g>
+          <rect x="1106" y="240" width="38" height="90" rx="4" fill="#0f172a" stroke="#fb7185" stroke-width="1.5"/>
+          <rect x="1106" y="240" width="38" height="90" rx="4" fill="rgba(136,19,55,0.4)" stroke="#fb7185" stroke-width="1.5"/>
+          <text x="1125" y="280" text-anchor="middle" fill="#fb7185" font-size="8" transform="rotate(-90 1125 280)">Gaussian Mixture</text>
+        </g>
+
+        <!-- mixture formula band -->
+        <rect x="60" y="350" width="1084" height="58" rx="8" fill="rgba(167,139,250,0.12)" stroke="#a78bfa" stroke-width="1"/>
+        <text x="80" y="372" fill="#c4b5fd" font-size="10.5" font-weight="bold">Gaussian Mixture (Eq. 11):  f(ψ|Z,α) = Σᵢ (ᾱᵢ/Σⱼᾱⱼ) · N(μᵢ, σᵢ²)</text>
+        <text x="80" y="392" fill="#94a3b8" font-size="9">each mode = one material class · weight = Dirichlet posterior · MMSE point estimate = Σ wᵢ μᵢ</text>
       </g>
 
-      <!-- ===== 3DGS ===== -->
+      <!-- arrow into 3DGS -->
+      <line x1="600" y1="432" x2="600" y2="466" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+      <!-- ===== ROW 3: SEMANTIC 3DGS (detailed) ===== -->
       <g>
-        <rect x="520" y="250" width="400" height="100" rx="8" fill="#0f172a" stroke="#fb923c" stroke-width="1.5"/>
-        <rect x="520" y="250" width="400" height="100" rx="8" fill="rgba(251,146,60,0.3)" stroke="#fb923c" stroke-width="1.5"/>
-        <text x="720" y="274" text-anchor="middle" fill="#fb923c" font-size="12" font-weight="bold">Semantic 3D Gaussian Splatting</text>
-        <text x="720" y="300" text-anchor="middle" fill="#e2e8f0" font-size="10">Material legend → recolor scenes</text>
-        <text x="720" y="318" text-anchor="middle" fill="#94a3b8" font-size="9">splatfacto-big (Nerfstudio), 20K iter</text>
-        <text x="720" y="336" text-anchor="middle" fill="#94a3b8" font-size="9">RTX A5000 · random scale 2.0</text>
+        <rect x="40" y="470" width="1120" height="150" rx="12" fill="none" stroke="#fb923c" stroke-width="1.8" stroke-dasharray="6,4"/>
+        <text x="60" y="494" fill="#fb923c" font-size="12" font-weight="bold">Semantic 3D Gaussian Splatting — material legend recolor → train splat → query per-point field</text>
+        <text x="60" y="512" fill="#94a3b8" font-size="9">note: properties are per-material, propagated to points via the splat (not learned per Gaussian)</text>
+
+        <g>
+          <rect x="60" y="528" width="255" height="76" rx="8" fill="#0f172a" stroke="#fb923c" stroke-width="1.5"/>
+          <rect x="60" y="528" width="255" height="76" rx="8" fill="rgba(251,146,60,0.3)" stroke="#fb923c" stroke-width="1.5"/>
+          <text x="187" y="548" text-anchor="middle" fill="#fb923c" font-size="10.5" font-weight="bold">Material Legend Recolor</text>
+          <text x="187" y="568" text-anchor="middle" fill="#e2e8f0" font-size="9.5">each material → unique color</text>
+          <text x="187" y="584" text-anchor="middle" fill="#94a3b8" font-size="8.5">recolor scene images (semantic encoding)</text>
+        </g>
+
+        <g>
+          <rect x="335" y="528" width="255" height="76" rx="8" fill="#0f172a" stroke="#fb923c" stroke-width="1.5"/>
+          <rect x="335" y="528" width="255" height="76" rx="8" fill="rgba(251,146,60,0.3)" stroke="#fb923c" stroke-width="1.5"/>
+          <text x="462" y="548" text-anchor="middle" fill="#fb923c" font-size="10.5" font-weight="bold">Splat Training</text>
+          <text x="462" y="568" text-anchor="middle" fill="#e2e8f0" font-size="9.5">splatfacto-big (Nerfstudio)</text>
+          <text x="462" y="584" text-anchor="middle" fill="#94a3b8" font-size="8.5">20K iter · RTX A5000 · scale 2.0</text>
+        </g>
+
+        <g>
+          <rect x="610" y="528" width="255" height="76" rx="8" fill="#0f172a" stroke="#fb923c" stroke-width="1.5"/>
+          <rect x="610" y="528" width="255" height="76" rx="8" fill="rgba(251,146,60,0.3)" stroke="#fb923c" stroke-width="1.5"/>
+          <text x="737" y="548" text-anchor="middle" fill="#fb923c" font-size="10.5" font-weight="bold">Per-Point Query</text>
+          <text x="737" y="568" text-anchor="middle" fill="#e2e8f0" font-size="9.5">point → material class → property</text>
+          <text x="737" y="584" text-anchor="middle" fill="#94a3b8" font-size="8.5">friction · hardness · density field</text>
+        </g>
+
+        <g>
+          <rect x="885" y="528" width="255" height="76" rx="8" fill="#0f172a" stroke="#fb923c" stroke-width="1.5"/>
+          <rect x="885" y="528" width="255" height="76" rx="8" fill="rgba(251,146,60,0.3)" stroke="#fb923c" stroke-width="1.5"/>
+          <text x="1012" y="548" text-anchor="middle" fill="#fb923c" font-size="10.5" font-weight="bold">Volume Integral</text>
+          <text x="1012" y="568" text-anchor="middle" fill="#e2e8f0" font-size="9.5">integrate density over volume</text>
+          <text x="1012" y="584" text-anchor="middle" fill="#94a3b8" font-size="8.5">→ object mass estimate</text>
+        </g>
+
+        <line x1="315" y1="566" x2="333" y2="566" stroke="#64748b" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <line x1="590" y1="566" x2="608" y2="566" stroke="#64748b" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <line x1="865" y1="566" x2="883" y2="566" stroke="#64748b" stroke-width="1.2" marker-end="url(#arrow)"/>
       </g>
 
-      <!-- ===== OUTPUTS ===== -->
+      <!-- arrow to outputs -->
+      <line x1="600" y1="620" x2="600" y2="648" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+      <!-- ===== ROW 4: OUTPUTS + APPLICATIONS ===== -->
       <g>
-        <rect x="1000" y="250" width="160" height="100" rx="8" fill="#0f172a" stroke="#fb7185" stroke-width="1.5"/>
-        <rect x="1000" y="250" width="160" height="100" rx="8" fill="rgba(136,19,55,0.4)" stroke="#fb7185" stroke-width="1.5"/>
-        <text x="1080" y="274" text-anchor="middle" fill="#fb7185" font-size="12" font-weight="bold">Outputs</text>
-        <text x="1080" y="300" text-anchor="middle" fill="#e2e8f0" font-size="9.5">Per-point field</text>
-        <text x="1080" y="316" text-anchor="middle" fill="#94a3b8" font-size="9">friction · hardness</text>
-        <text x="1080" y="330" text-anchor="middle" fill="#94a3b8" font-size="9">stiffness · density</text>
-        <text x="1080" y="344" text-anchor="middle" fill="#e2e8f0" font-size="9.5">+ object mass</text>
+        <rect x="40" y="652" width="520" height="84" rx="8" fill="#0f172a" stroke="#fb7185" stroke-width="1.5"/>
+        <rect x="40" y="652" width="520" height="84" rx="8" fill="rgba(136,19,55,0.25)" stroke="#fb7185" stroke-width="1.5"/>
+        <text x="300" y="674" text-anchor="middle" fill="#fb7185" font-size="11" font-weight="bold">Outputs</text>
+        <text x="300" y="696" text-anchor="middle" fill="#e2e8f0" font-size="9.5">per-point friction · hardness · stiffness · density</text>
+        <text x="300" y="712" text-anchor="middle" fill="#e2e8f0" font-size="9.5">object mass · aleatoric + epistemic uncertainty</text>
       </g>
 
-      <!-- arrows row 2 -->
-      <line x1="240" y1="350" x2="240" y2="390" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
-      <line x1="720" y1="350" x2="720" y2="390" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
-      <!-- VLM obs into bayesian (dashed cyan) -->
-      <line x1="760" y1="170" x2="240" y2="248" stroke="#22d3ee" stroke-width="1.2" stroke-dasharray="4,4" marker-end="url(#arrow-cyan)"/>
-      <line x1="620" y1="350" x2="1080" y2="352" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
-
-      <!-- ===== UNCERTAINTY ===== -->
       <g>
-        <rect x="40" y="400" width="240" height="110" rx="8" fill="#0f172a" stroke="#a78bfa" stroke-width="1.5"/>
-        <rect x="40" y="400" width="240" height="110" rx="8" fill="rgba(76,29,149,0.3)" stroke="#a78bfa" stroke-width="1.5"/>
-        <text x="160" y="424" text-anchor="middle" fill="#a78bfa" font-size="11" font-weight="bold">Uncertainty Decomposition</text>
-        <text x="160" y="452" text-anchor="middle" fill="#e2e8f0" font-size="10">Var[ψ] = E[σ²] + Var[μ]</text>
-        <text x="160" y="472" text-anchor="middle" fill="#94a3b8" font-size="9">aleatoric: sensor/class noise</text>
-        <text x="160" y="488" text-anchor="middle" fill="#94a3b8" font-size="9">epistemic: insufficient evidence</text>
-        <text x="160" y="504" text-anchor="middle" fill="#94a3b8" font-size="9">→ interpretable confidence</text>
+        <rect x="640" y="652" width="520" height="84" rx="8" fill="#0f172a" stroke="#34d399" stroke-width="1.5"/>
+        <rect x="640" y="652" width="520" height="84" rx="8" fill="rgba(6,78,59,0.3)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="900" y="674" text-anchor="middle" fill="#34d399" font-size="11" font-weight="bold">For Our Robot Project</text>
+        <text x="900" y="696" text-anchor="middle" fill="#e2e8f0" font-size="9.5">friction → PMAT__muXXX profiles</text>
+        <text x="900" y="712" text-anchor="middle" fill="#e2e8f0" font-size="9.5">epistemic map → where to measure physically</text>
       </g>
 
-      <!-- ===== QUERY ===== -->
-      <g>
-        <rect x="360" y="400" width="240" height="110" rx="8" fill="#0f172a" stroke="#fb923c" stroke-width="1.5"/>
-        <rect x="360" y="400" width="240" height="110" rx="8" fill="rgba(251,146,60,0.25)" stroke="#fb923c" stroke-width="1.5"/>
-        <text x="480" y="424" text-anchor="middle" fill="#fb923c" font-size="11" font-weight="bold">Spatial Queries</text>
-        <text x="480" y="452" text-anchor="middle" fill="#e2e8f0" font-size="10">Per-point: property at location</text>
-        <text x="480" y="472" text-anchor="middle" fill="#e2e8f0" font-size="10">Object-level: volume integral</text>
-        <text x="480" y="492" text-anchor="middle" fill="#94a3b8" font-size="9">→ mass from density field</text>
-      </g>
-
-      <!-- ===== APPLICATIONS ===== -->
-      <g>
-        <rect x="680" y="400" width="480" height="110" rx="8" fill="#0f172a" stroke="#34d399" stroke-width="1.5"/>
-        <rect x="680" y="400" width="480" height="110" rx="8" fill="rgba(6,78,59,0.25)" stroke="#34d399" stroke-width="1.5"/>
-        <text x="920" y="424" text-anchor="middle" fill="#34d399" font-size="11" font-weight="bold">Applications</text>
-        <text x="920" y="452" text-anchor="middle" fill="#e2e8f0" font-size="10">Object-scale: ABO-500 mass estimation</text>
-        <text x="920" y="472" text-anchor="middle" fill="#e2e8f0" font-size="10">Indoor: real-world friction + hardness</text>
-        <text x="920" y="492" text-anchor="middle" fill="#e2e8f0" font-size="10">Outdoor: RUGD / RELLIS-3D terrain</text>
-      </g>
-
-      <!-- arrows row 3 -->
-      <line x1="280" y1="455" x2="358" y2="455" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
-      <line x1="600" y1="455" x2="678" y2="455" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
-      <!-- query -> app -->
-      <line x1="480" y1="510" x2="480" y2="540" stroke="#64748b" stroke-width="1.2" stroke-dasharray="4,4" marker-end="url(#arrow)"/>
-      <text x="520" y="556" fill="#94a3b8" font-size="9">3DGS field serves all queries</text>
-
-      <!-- ===== FOOTNOTE BAND ===== -->
-      <rect x="40" y="580" width="1120" height="40" rx="8" fill="rgba(148,163,184,0.08)" stroke="#334155" stroke-width="1"/>
-      <text x="600" y="604" text-anchor="middle" fill="#94a3b8" font-size="10">Unified framework: reconstruction + uncertainty + physical reasoning in one spatially continuous representation</text>
+      <line x1="560" y1="694" x2="638" y2="694" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
 
       <!-- LEGEND -->
-      <g transform="translate(40, 630)">
+      <g transform="translate(40, 744)">
         <rect x="0" y="0" width="12" height="12" rx="3" fill="rgba(34,211,238,0.4)" stroke="#22d3ee"/><text x="18" y="10" fill="#94a3b8" font-size="9">VLM/vision</text>
         <rect x="90" y="0" width="12" height="12" rx="3" fill="rgba(76,29,149,0.4)" stroke="#a78bfa"/><text x="108" y="10" fill="#94a3b8" font-size="9">Bayesian</text>
         <rect x="180" y="0" width="12" height="12" rx="3" fill="rgba(251,146,60,0.3)" stroke="#fb923c"/><text x="198" y="10" fill="#94a3b8" font-size="9">3DGS</text>
@@ -389,7 +427,7 @@
     <tr><td>EVORA</td><td>2D map</td><td>Evidential traction distribution</td><td>✓ (aleatoric+epistemic)</td><td>Friction-focused</td><td>✓</td></tr>
     <tr><td>Ewen et al.</td><td>2D map</td><td>Joint belief over semantics + continuous property</td><td>✓</td><td>Friction-focused</td><td>✗</td></tr>
     <tr><td>STEP</td><td>2D map</td><td>CVaR risk planning (DARPA SubT)</td><td>✓</td><td>Traversability</td><td>✗</td></tr>
-    <tr><td><b>PhysGS</b></td><td><b>3DGS</b></td><td><b>Dirichlet + NIG Bayesian fusion of VLM priors</b></td><td><b>✓ full decomposition</b></td><td><b>✓ 5 properties</b></td><td>✗ coming soon</td></tr>
+    <tr><td><b>PhysGS</b></td><td><b>3DGS</b></td><td><b>Dirichlet + NIG Bayesian fusion of VLM priors</b></td><td><b>✓ full decomposition</b></td><td><b>✓ 5 properties</b></td><td>✓ MIT</td></tr>
   </table>
   <p class="small muted">Positioning: the first work to embed a full hierarchical Bayesian inference in 3DGS, covering point-level + object-level, indoor + outdoor. NeRF2Physics is the direct predecessor and strongest baseline; PhysGS trades NeRF's implicit field for 3DGS's explicitness, queryability and uncertainty.</p>
 </section>
@@ -398,7 +436,7 @@
 <section>
   <h2>Limitations and Engineering Notes</h2>
   <div class="limitation"><b>Stated by the paper:</b> ① Sensitive to SAM segmentation quality — when masks merge visually similar materials, property estimates inherit the ambiguity; future direction is VLM-guided segmentation refinement; ② Shadow evolution not modeled; ③ Material parameters are set manually, no automatic assignment.</div>
-  <div class="limitation"><b>Engineering view (our additions):</b> ① Code not released — "Coming Soon" at the CVPR 2026 paper stage, reproduction waits for the official release; ② GPT-5 is a closed commercial API, each inference costs money, performance with open VLM (Qwen-VL, InternVL) is unknown, no ablation; ③ SAM→GPT-5 two-stage error cascade — Bayesian confidence weighting mitigates but cannot remove it; ④ "Per-point" is really "per-material" — properties are estimated per material class then propagated to points; a wrong class corrupts all its points; ⑤ Small evaluation sets (6 friction points, 15 objects), outdoor only qualitative.</div>
+  <div class="limitation"><b>Engineering view (our additions):</b> ① Code is now MIT open-source (github.com/samchopra2003/PhysGS-Codebase, 2026-06-27). Bayesian core filter_utils.py (~100 lines numpy) is independently reusable; full pipeline needs requirements fixes (file:/// local paths, openai 0.28) + Nerfstudio; VLM can switch to qwen-vl-max (--vlm qwen); ② Cross-view grouping is by material NAME, not spatial projection — a real implementation limitation; ③ GPT-5 is a closed commercial API, no open-VLM ablation; ④ SAM→GPT-5 error cascade — Bayesian weighting mitigates but cannot remove it; ⑤ "Per-point" is really "per-material" — a wrong class corrupts all its points; ⑥ Small evaluation sets (6 friction points, 15 objects), outdoor only qualitative.</div>
 </section>
 
 <!-- ============ FOR US ============ -->
@@ -407,7 +445,7 @@
   <div class="takeaway"><b>Output maps directly to PMAT__muXXX:</b> per-point friction → region aggregation → PMAT__mu080/mu100 material names → feed the IsaacLab friction parsing chain, an order of magnitude faster than manual labeling. This is one of the core routes in our physical-property-estimation review.</div>
   <div class="takeaway"><b>Uncertainty = active sampling guidance:</b> high-epistemic regions are exactly where we should physically measure friction. More engineering-friendly than single-point estimates, it tells us "where it is worth another measurement".</div>
   <div class="takeaway"><b>Complements GaussGym:</b> GaussGym solves "where the scene comes from" (scan to sim in minutes), PhysGS solves "how to label scene physics" (per-point friction/hardness). Together they close GaussGym's self-admitted gap of uniform asset physics parameters.</div>
-  <div class="takeaway"><b>Adoption path:</b> wait for official code → or follow the EVORA / Ewen et al. self-built route with an open VLM + simplified Bayesian fusion (the VLM+RAG prototype is the fastest first step, see the physical-property-estimation page).</div>
+  <div class="takeaway"><b>Adoption path:</b> ① fastest: reuse official filter_utils.py Bayesian core + friction prompts from gpt_inference.py, plug our own segmentation and VLM (qwen-vl-max via --vlm qwen); ② full reproduction: fix requirements then run the official abo_500 pipeline; ③ or follow the EVORA / Ewen et al. self-built route (VLM+RAG prototype is the fastest first step).</div>
 </section>
 
 </main>

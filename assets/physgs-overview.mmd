@@ -1,45 +1,49 @@
 %% PhysGS: Bayesian-Inferred Gaussian Splatting for Physical Property Estimation
 %% presentation panorama — CVPR 2026 (arXiv:2511.18570)
 flowchart TD
-    T["PhysGS: Bayesian-Inferred Gaussian Splatting for Physical Property Estimation "]
+    T["PhysGS: Bayesian-Inferred Gaussian Splatting for Physical Property Estimation"]
 
     subgraph SG_IN["Input"]
-        IN1["Multi-view RGB Images"]
+        IN1["Multi-view RGB Images (N views of same scene)"]
         IN2["GPT-5 VLM (vision-language prior)"]
     end
 
     subgraph SG_SEG["Segmentation (SAM)"]
-        SAM1["Whole / Part / Sub-part masks"]
+        SAM1["Whole / Part / Sub-part masks (per view)"]
         SAM2["IoU + stability filtering"]
     end
 
-    subgraph SG_VLM["VLM Prompting"]
+    subgraph SG_VLM["VLM Prompting (GPT-5)"]
         VP1["3-image triplet: full + mask overlay + isolated part"]
-        VP2["Material label + property + confidence p in [0,1]"]
+        VP2["caption · material · property · confidence p in [0,1]"]
+        VP3["Observation O_m = (c_m, p_m, ψ_m)"]
     end
 
-    subgraph SG_BAYES["Bayesian Inference over Splats"]
-        B1["Dirichlet-Categorical (discrete material)"]
-        B2["Confidence-weighted moments (continuous property)"]
-        B3["NIG prior: aleatoric + epistemic uncertainty"]
-        B4["Cross-view posterior refinement"]
+    subgraph SG_BAYES["Bayesian Inference over Splats (hierarchical: p(z,ψ|Z)=p(ψ|z)·p(z|Z))"]
+        B1["1 · Dirichlet-Categorical: ᾱᵢ = αᵢ(0) + Σ λ·pₘ  →  material posterior wᵢ = ᾱᵢ/Σᾱⱼ"]
+        B2["2 · Confidence-weighted moments: W=Σp, S=Σpψ, Q=Σpψ²  →  μᵢ=S/W, σᵢ²=Q/W−μᵢ²"]
+        B3["3 · NIG prior: aleatoric=β̃/(ᾱ−1), epistemic=E[σ²]/κ̃"]
+        B4["Gaussian Mixture (Eq. 11): f(ψ|Z,α) = Σᵢ (ᾱᵢ/Σⱼᾱⱼ)·N(μᵢ,σᵢ²)  →  MMSE = Σ wᵢμᵢ"]
+        B5["streaming: O(1) closed-form updates · no history · cross-view fusion by material-name grouping"]
     end
 
-    subgraph SG_GS["Semantic 3DGS"]
-        GS1["Material legend recolor"]
-        GS2["Splatfacto-big (Nerfstudio), 20K iter"]
-        GS3["Per-point property field"]
+    subgraph SG_GS["Semantic 3DGS (per-material properties propagated to points)"]
+        GS1["Material legend recolor: each material → unique color"]
+        GS2["Splat training: splatfacto-big (Nerfstudio), 20K iter, RTX A5000"]
+        GS3["Per-point query: point → material class → property (friction/hardness/density)"]
+        GS4["Volume integral: integrate density over volume → object mass"]
     end
 
     subgraph SG_OUT["Outputs"]
-        O1["Friction / Hardness / Stiffness / Density / Mass"]
-        O2["Aleatoric + epistemic uncertainty maps"]
+        O1["Per-point friction / hardness / stiffness / density"]
+        O2["Object mass"]
+        O3["Aleatoric + epistemic uncertainty"]
     end
 
     subgraph SG_USE["For Our Project"]
-        U1["Map to PMAT__muXXX friction profiles"]
-        U2["Active sampling: where to measure friction"]
-        U3["Complement GaussGym scene pipeline"]
+        U1["Friction → PMAT__muXXX profiles"]
+        U2["Epistemic map → where to measure friction physically"]
+        U3["Complements GaussGym scene pipeline"]
     end
 
     T --> IN1
@@ -47,19 +51,23 @@ flowchart TD
     SAM1 --> SAM2
     SAM2 --> VP1
     VP1 --> VP2
+    VP2 --> VP3
     IN2 -.-> VP2
-    VP2 --> B1
-    VP2 --> B2
-    B1 --> B3
-    B2 --> B3
+    VP3 --> B1
+    VP3 --> B2
+    B1 --> B4
+    B2 --> B4
     B3 --> B4
-    B4 --> GS1
+    B4 --> B5
+    B5 --> GS1
     GS1 --> GS2
     GS2 --> GS3
-    GS3 --> O1
-    GS3 --> O2
+    GS3 --> GS4
+    GS4 --> O1
+    GS4 --> O2
+    GS3 --> O3
     O1 --> U1
-    O2 --> U2
+    O3 --> U2
     U1 --> U3
 
     classDef inp fill:#c8e6c9,stroke:#388e3c;
@@ -72,9 +80,9 @@ flowchart TD
     classDef title fill:#eceff1,stroke:#455a64;
     class IN1,IN2 inp;
     class SAM1,SAM2 seg;
-    class VP1,VP2 vlm;
-    class B1,B2,B3,B4 bay;
-    class GS1,GS2,GS3 gs;
-    class O1,O2 out;
+    class VP1,VP2,VP3 vlm;
+    class B1,B2,B3,B4,B5 bay;
+    class GS1,GS2,GS3,GS4 gs;
+    class O1,O2,O3 out;
     class U1,U2,U3 use;
     class T title;
