@@ -12,6 +12,12 @@ tags: [meta]
 > Format: `## [YYYY-MM-DD] action | subject`
 > Actions: ingest, update, query, lint, create, archive, delete
 
+## [2026-08-31] update | PhysGS 代码开源状态修正
+- 事实修正：PhysGS 代码已于 2026-06-27 在 github.com/samchopra2003/PhysGS-Codebase 开源（MIT license，public）
+- 核验：clone 确认贝叶斯核心真实实现（filter_utils.py：dirichlet_update/gaussian_stats_per_class/compute_uncertainties 对应论文公式 5/6-7/13-14），prompt 设计在 gpt_inference.py，支持 --vlm qwen（qwen-vl-max）
+- 落地评估：全管线复现需修 requirements（file:/// 本机路径依赖、openai 0.28 旧版）+ Nerfstudio；最快路径是复用 filter_utils.py 贝叶斯核心搭简化版
+- 更新 concepts/physgs.md 四处（概览/链接/对比表/局限/落地路径）
+
 ## [2026-08-31] archive | HTML 演讲报告移入 wiki
 - 按用户要求：两个 HTML 详细报告从本地 ~/report/ 移入 wiki repo
   - reports/physgs/index.html（PhysGS 演讲报告）

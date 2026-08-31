@@ -12,12 +12,12 @@ confidence: high
 
 ## 一、项目概览
 
-PhysGS（Physics Gaussian Splatting）是一个把 **Bayesian 推断嵌进 3D Gaussian Splatting** 的框架，从多视角 RGB 图像 + VLM（GPT-5）视觉语言先验，估计稠密、逐点的物理属性：摩擦系数、Shore 硬度、刚度、密度、质量，并输出校准过的 aleatoric（随机）与 epistemic（认知）不确定性。论文作者 Samarth Chopra、Jing Liang、Gershom Seneviratne、Dinesh Manocha（University of Maryland, College Park），发表于 CVPR 2026（pages 18980-18990），arXiv:2511.18570（2025-11-23 提交），代码标注 "Coming Soon"，目前未开源。^[raw/papers/physgs-arxiv-2511-18570.md]
+PhysGS（Physics Gaussian Splatting）是一个把 **Bayesian 推断嵌进 3D Gaussian Splatting** 的框架，从多视角 RGB 图像 + VLM（GPT-5）视觉语言先验，估计稠密、逐点的物理属性：摩擦系数、Shore 硬度、刚度、密度、质量，并输出校准过的 aleatoric（随机）与 epistemic（认知）不确定性。论文作者 Samarth Chopra、Jing Liang、Gershom Seneviratne、Dinesh Manocha（University of Maryland, College Park），发表于 CVPR 2026（pages 18980-18990），arXiv:2511.18570（2025-11-23 提交）。**代码已于 2026-06-27 开源（MIT）**：github.com/samchopra2003/PhysGS-Codebase。^[raw/papers/physgs-arxiv-2511-18570.md]
 
 关键链接：
 - 论文：https://arxiv.org/abs/2511.18570
 - 官网：https://samchopra2003.github.io/physgs
-- 代码：官方声明 Code (Coming Soon)，发布时未开源
+- 代码：github.com/samchopra2003/PhysGS-Codebase（MIT，2026-06-27 开源；贝叶斯核心 filter_utils.py 可独立复用）
 - CVPR Poster: https://cvpr.thecvf.com/virtual/2026/poster/36542
 
 核心数字：相比最强确定性 baseline（NeRF2Physics），质量估计误差降 22.8%（APE），Shore 硬度误差降 61.2%（ADE），动摩擦误差降 18.1%（ALDE）。论文自评是"把 3D 重建、不确定性建模、物理推理统一进一个空间连续框架"。
@@ -137,7 +137,7 @@ Ablation（Bayesian 更新的贡献，ABO-500 val）：Ours w/o BI vs Ours with 
 | EVORA | 2D 图 | evidential traction 分布，分 aleatoric/epistemic | ✓ | 摩擦为主 | ✓ |
 | Ewen et al. | 2D 图 | 语义+连续属性联合信念 | ✓ | 摩擦为主 | ✗ |
 | STEP | 2D 图 | CVaR 风险规划（DARPA SubT） | ✓ | traversability | ✗ |
-| **PhysGS** | 3DGS | Dirichlet + NIG Bayesian 融合 VLM 先验 | ✓ | 摩擦/硬度/刚度/密度/质量 | ✗(coming soon) |
+| **PhysGS** | 3DGS | Dirichlet + NIG Bayesian 融合 VLM 先验 | ✓ | 摩擦/硬度/刚度/密度/质量 | ✓ MIT（2026-06 开源） |
 
 关键差异：PhysGS 是第一个把**完整分层 Bayesian 推断（离散 Dirichlet + 连续 NIG）嵌入 3DGS** 的工作，同时覆盖点级和物体级、室内和室外。NeRF2Physics 是它的直接 baseline 和前身，PhysGS 用 3DGS（快、显式、可逐点查询）+ 显式不确定性换掉了 NeRF 的隐式场。
 
@@ -157,7 +157,7 @@ Ablation（Bayesian 更新的贡献，ABO-500 val）：Ours w/o BI vs Ours with 
 3. 摩擦估计样本量极小（6 点），统计可靠性存疑（我的补充）。
 
 我的补充（工程视角）：
-1. **代码未开源**："Coming Soon" 停留在 CVPR 2026 论文版，想复现只能等官方 release，这是当前落地最大障碍。
+1. **落地障碍已解除（2026-06-27 代码 MIT 开源）**：github.com/samchopra2003/PhysGS-Codebase。贝叶斯核心 filter_utils.py（~100 行 numpy）可独立复用，prompt 设计（gpt_inference.py）可直接借鉴。但全管线复现需修 requirements（含本机路径 file:/// 依赖、openai 0.28 旧版）、配 Nerfstudio、VLM 可切 qwen-vl-max（--vlm qwen）。
 2. **VLM 依赖**：GPT-5 是闭源商业 API，每次推理花钱且不透明；换成开源 VLM（Qwen-VL、InternVL）性能未知，论文无 ablation。
 3. **SAM + GPT-5 两段式**：误差级联，SAM mask 错 → GPT-5 对错的部分推理 → Bayesian 再自信地把错误信念固化（置信度加权只能缓解不能消除）。
 4. **评估局限**：ABO-500 是商品（家具、瓶子），摩擦-硬度数据集是 15 个家居物体，outdoor 只有 qualitative 展示没有数值。
@@ -170,7 +170,7 @@ PhysGS 是我们"扫描场景自动物理标注"调研（[[physical-property-est
 - **输出可直接映射 PMAT__muXXX**：逐点摩擦 → 按区域聚合成 PMAT__mu080/mu100 等材质名 → 喂给 [[isaac-friction-profiles]] 的解析链，比手工标注快一个量级。
 - **不确定性是加分项**：epistemic 高估的区域 = 该去实地测摩擦的地方（主动采样引导），比单点估计更工程友好。
 - **粗糙度信号源**：SH 系数 + mesh 几何起伏（[[physical-property-estimation-from-scans]] 已记录）与 PhysGS 的硬度/刚度互补。
-- **落地路径**：等官方代码 → 或者参考 Ewen et al./EVORA 的自研路线，用开源 VLM + 简化 Bayesian 融合自己搭（见 [[physical-property-estimation-from-scans]] 的 VLM+RAG 方案，最快 prototype）。
+- **落地路径（已更新）**：代码已 MIT 开源。①最快：直接复用官方 filter_utils.py 贝叶斯核心 + gpt_inference.py 的 friction prompt，接我们自己的分割和 VLM（可切 qwen-vl-max）搭简化版；②完整复现：修 requirements 后跑官方 abo_500 管线做对比实验；③参考 Ewen et al./EVORA 自研（见 [[physical-property-estimation-from-scans]] 的 VLM+RAG 方案，最快 prototype）。
 - **与 GaussGym 衔接**：GaussGym（[[gaussgym]]）解决"场景怎么来"（扫描→sim 分钟级），PhysGS 解决"场景物理属性怎么标"（逐点摩擦/硬度），两者合起来正好补上 GaussGym 自认的"资产物理参数统一"短板。
 
 ## 参考来源
