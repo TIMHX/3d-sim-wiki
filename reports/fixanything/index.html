@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FixAnything — 3D-Consistent Rendering Refinement via Video Generative Priors (ECCV 2026)</title>
+<style>
+  :root {
+    --bg: #020617;
+    --panel: #0f172a;
+    --panel2: #1e293b;
+    --line: #334155;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --cyan: #22d3ee;
+    --emerald: #34d399;
+    --violet: #a78bfa;
+    --amber: #fbbf24;
+    --rose: #fb7185;
+    --orange: #fb923c;
+    --slate: #94a3b8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "JetBrains Mono", "SF Mono", Consolas, monospace;
+    line-height: 1.6;
+    padding-bottom: 80px;
+  }
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(30,41,59,.25) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(30,41,59,.25) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  header { padding: 48px 40px 24px; max-width: 1200px; margin: 0 auto; }
+  .pulse { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--emerald); margin-right: 10px; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+  header h1 { font-size: 28px; letter-spacing: -0.5px; }
+  header .sub { color: var(--muted); font-size: 13px; margin-top: 8px; }
+  header .meta { color: var(--muted); font-size: 11px; margin-top: 6px; }
+  main { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+  section { margin: 40px 0; }
+  h2 { font-size: 20px; color: var(--cyan); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+  h2::before { content: ""; width: 8px; height: 8px; background: var(--cyan); border-radius: 2px; }
+  h3 { font-size: 15px; color: var(--text); margin: 24px 0 10px; }
+  p, li { font-size: 13px; color: var(--text); }
+  .muted { color: var(--muted); }
+  .small { font-size: 11px; }
+  .diagram-card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 20px; overflow-x: auto; }
+  .diagram-card svg { display: block; margin: 0 auto; min-width: 900px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 20px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px; }
+  .card h3 { font-size: 13px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .card ul { list-style: none; }
+  .card li { font-size: 12px; color: var(--muted); padding: 4px 0; border-bottom: 1px dashed rgba(51,65,85,.5); }
+  .card li:last-child { border-bottom: none; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 12px 0; }
+  th, td { padding: 7px 9px; text-align: left; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: normal; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; }
+  td.num { font-variant-numeric: tabular-nums; }
+  .best { color: var(--emerald); font-weight: bold; }
+  .formula { background: var(--panel2); border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; font-size: 13px; margin: 10px 0; overflow-x: auto; white-space: nowrap; color: var(--violet); }
+  .formula .lbl { color: var(--muted); font-size: 11px; display: block; margin-bottom: 6px; }
+  .tag { display: inline-block; background: rgba(34,211,238,.1); color: var(--cyan); border: 1px solid rgba(34,211,238,.3); border-radius: 4px; padding: 1px 8px; font-size: 11px; margin-right: 6px; }
+  .tag.g { color: var(--emerald); background: rgba(52,211,153,.1); border-color: rgba(52,211,153,.3); }
+  .tag.v { color: var(--violet); background: rgba(167,139,250,.1); border-color: rgba(167,139,250,.3); }
+  .tag.a { color: var(--amber); background: rgba(251,191,36,.1); border-color: rgba(251,191,36,.3); }
+  .tag.r { color: var(--rose); background: rgba(251,113,133,.1); border-color: rgba(251,113,133,.3); }
+  .limitation { border-left: 3px solid var(--rose); padding: 10px 16px; background: rgba(251,113,133,.06); border-radius: 0 8px 8px 0; margin: 10px 0; font-size: 12px; }
+  .takeaway { border-left: 3px solid var(--emerald); padding: 10px 16px; background: rgba(52,211,153,.06); border-radius: 0 8px 8px 0; margin: 10px 0; font-size: 12px; }
+  .note { border-left: 3px solid var(--amber); padding: 10px 16px; background: rgba(251,191,36,.06); border-radius: 0 8px 8px 0; margin: 10px 0; font-size: 12px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+  footer { max-width: 1200px; margin: 60px auto 0; padding: 20px 40px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; font-size: 11px; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend .box { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+</style>
+</head>
+<body class="grid-bg">
+
+<header>
+  <div><span class="pulse"></span><span style="font-size:12px;color:var(--muted)">LITERATURE REVIEW · ROBOTICS PROJECT · 2026-08-31</span></div>
+  <h1 style="margin-top:10px">FixAnything: 3D-Consistent Rendering Refinement<br>via Video Generative Priors</h1>
+  <div class="sub">一个通用视频扩散模型修复 3DGS / NeRF / mesh / 稀疏点云的渲染伪影 —— 把渲染清理重定义为 video-to-video 翻译</div>
+  <div class="meta">
+    <span class="tag">ECCV 2026</span><span class="tag g">arXiv:2608.23549</span><span class="tag v">CMU</span><span class="tag a">代码未开源</span>
+    Vuong · Ramanan · Narasimhan — Carnegie Mellon University
+  </div>
+</header>
+
+<main>
+
+<!-- ============ ARCHITECTURE ============ -->
+<section>
+  <h2>系统架构</h2>
+  <div class="diagram-card">
+    <svg viewBox="0 0 1200 640" xmlns="http://www.w3.org/2000/svg" font-family="'JetBrains Mono',Consolas,monospace">
+      <defs>
+        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+          <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+        </pattern>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+        </marker>
+        <marker id="arrow-cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#22d3ee"/>
+        </marker>
+      </defs>
+      <rect width="1200" height="640" fill="url(#grid)"/>
+
+      <text x="600" y="30" text-anchor="middle" fill="#e2e8f0" font-size="15" font-weight="bold">FixAnything: Degraded Render → Clean Video via Pretrained Video Diffusion</text>
+
+      <!-- ===== INPUT ROW: 4 representations ===== -->
+      <g>
+        <rect x="40" y="60" width="265" height="100" rx="8" fill="#0f172a" stroke="#fb923c" stroke-width="1.5"/>
+        <rect x="40" y="60" width="265" height="100" rx="8" fill="rgba(251,146,60,0.3)" stroke="#fb923c" stroke-width="1.5"/>
+        <text x="172" y="84" text-anchor="middle" fill="#fb923c" font-size="12" font-weight="bold">Any 3D Representation</text>
+        <text x="172" y="108" text-anchor="middle" fill="#e2e8f0" font-size="10">3DGS (floaters) · NeRF (fog)</text>
+        <text x="172" y="124" text-anchor="middle" fill="#e2e8f0" font-size="10">Mesh (texture warp) · Points (holes)</text>
+        <text x="172" y="146" text-anchor="middle" fill="#94a3b8" font-size="9">render along camera trajectory</text>
+      </g>
+
+      <g>
+        <rect x="350" y="60" width="250" height="100" rx="8" fill="#0f172a" stroke="#fbbf24" stroke-width="1.5"/>
+        <rect x="350" y="60" width="250" height="100" rx="8" fill="rgba(120,53,15,0.3)" stroke="#fbbf24" stroke-width="1.5"/>
+        <text x="475" y="84" text-anchor="middle" fill="#fbbf24" font-size="12" font-weight="bold">Degraded Video x</text>
+        <text x="475" y="108" text-anchor="middle" fill="#e2e8f0" font-size="10">VAE-encode → z_cond</text>
+        <text x="475" y="128" text-anchor="middle" fill="#94a3b8" font-size="9">preserves camera trajectory</text>
+        <text x="475" y="144" text-anchor="middle" fill="#94a3b8" font-size="9">+ coarse scene layout</text>
+      </g>
+
+      <g>
+        <rect x="645" y="60" width="250" height="100" rx="8" fill="#0f172a" stroke="#34d399" stroke-width="1.5"/>
+        <rect x="645" y="60" width="250" height="100" rx="8" fill="rgba(6,78,59,0.4)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="770" y="84" text-anchor="middle" fill="#34d399" font-size="12" font-weight="bold">Trust Mask m ∈ {0,1}^T</text>
+        <text x="770" y="108" text-anchor="middle" fill="#e2e8f0" font-size="10">m=1: training views (trust)</text>
+        <text x="770" y="126" text-anchor="middle" fill="#e2e8f0" font-size="10">m=0: degraded frames (fix)</text>
+        <text x="770" y="146" text-anchor="middle" fill="#94a3b8" font-size="9">clean frames = anchors</text>
+      </g>
+
+      <!-- ===== CORE MODEL ===== -->
+      <g>
+        <rect x="940" y="60" width="220" height="100" rx="8" fill="#0f172a" stroke="#a78bfa" stroke-width="2"/>
+        <rect x="940" y="60" width="220" height="100" rx="8" fill="rgba(76,29,149,0.4)" stroke="#a78bfa" stroke-width="2"/>
+        <text x="1050" y="84" text-anchor="middle" fill="#a78bfa" font-size="12" font-weight="bold">Wan2.1-I2V-14B</text>
+        <text x="1050" y="106" text-anchor="middle" fill="#e2e8f0" font-size="10">LoRA rank-64 (&lt;1% params)</text>
+        <text x="1050" y="124" text-anchor="middle" fill="#94a3b8" font-size="9">VAE + base frozen</text>
+        <text x="1050" y="144" text-anchor="middle" fill="#94a3b8" font-size="9">flow-matching objective</text>
+      </g>
+
+      <line x1="305" y1="110" x2="348" y2="110" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <line x1="600" y1="110" x2="643" y2="110" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <line x1="895" y1="110" x2="938" y2="110" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+      <!-- ===== CONDITIONING ===== -->
+      <g>
+        <rect x="40" y="250" width="420" height="100" rx="8" fill="#0f172a" stroke="#22d3ee" stroke-width="1.5"/>
+        <rect x="40" y="250" width="420" height="100" rx="8" fill="rgba(8,51,68,0.4)" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="250" y="274" text-anchor="middle" fill="#22d3ee" font-size="12" font-weight="bold">Conditioning (channel concat in latent)</text>
+        <text x="250" y="302" text-anchor="middle" fill="#e2e8f0" font-size="11">ẑ_t = [z_t ; z_cond ; m]</text>
+        <text x="250" y="322" text-anchor="middle" fill="#94a3b8" font-size="9">z_t = (1−t)·z_0 + t·ε  (rectified flow)</text>
+        <text x="250" y="338" text-anchor="middle" fill="#94a3b8" font-size="9">L_FM = E‖v − v_θ(ẑ_t, t)‖²</text>
+      </g>
+
+      <!-- ===== TRAINING STAGES ===== -->
+      <g>
+        <rect x="520" y="250" width="420" height="100" rx="8" fill="#0f172a" stroke="#34d399" stroke-width="1.5"/>
+        <rect x="520" y="250" width="420" height="100" rx="8" fill="rgba(6,78,59,0.3)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="730" y="274" text-anchor="middle" fill="#34d399" font-size="12" font-weight="bold">Training Data (DL3DV-10K)</text>
+        <text x="730" y="302" text-anchor="middle" fill="#e2e8f0" font-size="10">4 representations × 61-frame trajectories</text>
+        <text x="730" y="322" text-anchor="middle" fill="#94a3b8" font-size="9">Nerfacto · gsplat 7K (underfit) · MapAnything · COLMAP pts</text>
+        <text x="730" y="338" text-anchor="middle" fill="#94a3b8" font-size="9">as few as 20 paired videos suffice</text>
+      </g>
+
+      <!-- ===== STAGE II DPO ===== -->
+      <g>
+        <rect x="1000" y="250" width="160" height="100" rx="8" fill="#0f172a" stroke="#fb7185" stroke-width="1.5"/>
+        <rect x="1000" y="250" width="160" height="100" rx="8" fill="rgba(136,19,55,0.4)" stroke="#fb7185" stroke-width="1.5"/>
+        <text x="1080" y="274" text-anchor="middle" fill="#fb7185" font-size="11" font-weight="bold">Stage II</text>
+        <text x="1080" y="296" text-anchor="middle" fill="#e2e8f0" font-size="9.5">Flow-DPO</text>
+        <text x="1080" y="312" text-anchor="middle" fill="#94a3b8" font-size="9">reward = COLMAP</text>
+        <text x="1080" y="326" text-anchor="middle" fill="#94a3b8" font-size="9">pose AUC@5°</text>
+        <text x="1080" y="342" text-anchor="middle" fill="#94a3b8" font-size="9">61.1 → 68.3</text>
+      </g>
+
+      <line x1="460" y1="300" x2="518" y2="300" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <line x1="940" y1="300" x2="998" y2="300" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+      <!-- ===== OUTPUT ===== -->
+      <g>
+        <rect x="40" y="400" width="520" height="110" rx="8" fill="#0f172a" stroke="#fb7185" stroke-width="1.5"/>
+        <rect x="40" y="400" width="520" height="110" rx="8" fill="rgba(136,19,55,0.25)" stroke="#fb7185" stroke-width="1.5"/>
+        <text x="300" y="424" text-anchor="middle" fill="#fb7185" font-size="12" font-weight="bold">Clean Output y (T×3×H×W)</text>
+        <text x="300" y="452" text-anchor="middle" fill="#e2e8f0" font-size="10">per-frame quality: PSNR 17.65 @6 views (3DGS input)</text>
+        <text x="300" y="472" text-anchor="middle" fill="#94a3b8" font-size="9">geometric consistency: AUC@5° 68.3</text>
+        <text x="300" y="490" text-anchor="middle" fill="#94a3b8" font-size="9">5 denoising steps: 31 s / 61-frame @ 480×832 (H100)</text>
+      </g>
+
+      <!-- ===== UNCERTAINTY ===== -->
+      <g>
+        <rect x="640" y="400" width="300" height="110" rx="8" fill="#0f172a" stroke="#a78bfa" stroke-width="1.5"/>
+        <rect x="640" y="400" width="300" height="110" rx="8" fill="rgba(76,29,149,0.3)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="790" y="424" text-anchor="middle" fill="#a78bfa" font-size="11" font-weight="bold">Uncertainty (training-free)</text>
+        <text x="790" y="452" text-anchor="middle" fill="#e2e8f0" font-size="10">N=5 seeds → per-pixel std</text>
+        <text x="790" y="472" text-anchor="middle" fill="#94a3b8" font-size="9">confident 25% px: PSNR 25.7 dB</text>
+        <text x="790" y="488" text-anchor="middle" fill="#94a3b8" font-size="9">unconfident 25% px: 14.4 dB</text>
+      </g>
+
+      <!-- ===== APPLICATIONS ===== -->
+      <g>
+        <rect x="1000" y="400" width="160" height="110" rx="8" fill="#0f172a" stroke="#34d399" stroke-width="1.5"/>
+        <rect x="1000" y="400" width="160" height="110" rx="8" fill="rgba(6,78,59,0.3)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="1080" y="424" text-anchor="middle" fill="#34d399" font-size="11" font-weight="bold">For Us</text>
+        <text x="1080" y="452" text-anchor="middle" fill="#e2e8f0" font-size="9.5">clean GaussGym</text>
+        <text x="1080" y="468" text-anchor="middle" fill="#e2e8f0" font-size="9.5">training renders</text>
+        <text x="1080" y="488" text-anchor="middle" fill="#94a3b8" font-size="9">rescan guide via</text>
+        <text x="1080" y="502" text-anchor="middle" fill="#94a3b8" font-size="9">uncertainty map</text>
+      </g>
+
+      <line x1="300" y1="510" x2="300" y2="540" stroke="#64748b" stroke-width="1.2" stroke-dasharray="4,4" marker-end="url(#arrow)"/>
+      <line x1="940" y1="455" x2="998" y2="455" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+      <rect x="40" y="580" width="1120" height="40" rx="8" fill="rgba(148,163,184,0.08)" stroke="#334155" stroke-width="1"/>
+      <text x="600" y="604" text-anchor="middle" fill="#94a3b8" font-size="10">Key insight: degraded render preserves camera motion + coarse layout → repurpose video prior, no SE(3) teaching needed</text>
+
+      <g transform="translate(40, 630)">
+        <rect x="0" y="0" width="12" height="12" rx="3" fill="rgba(251,146,60,0.3)" stroke="#fb923c"/><text x="18" y="10" fill="#94a3b8" font-size="9">input</text>
+        <rect x="70" y="0" width="12" height="12" rx="3" fill="rgba(34,211,238,0.4)" stroke="#22d3ee"/><text x="88" y="10" fill="#94a3b8" font-size="9">conditioning</text>
+        <rect x="180" y="0" width="12" height="12" rx="3" fill="rgba(76,29,149,0.4)" stroke="#a78bfa"/><text x="198" y="10" fill="#94a3b8" font-size="9">model/uncertainty</text>
+        <rect x="310" y="0" width="12" height="12" rx="3" fill="rgba(251,113,133,0.4)" stroke="#fb7185"/><text x="328" y="10" fill="#94a3b8" font-size="9">output</text>
+        <rect x="390" y="0" width="12" height="12" rx="3" fill="rgba(52,211,153,0.4)" stroke="#34d399"/><text x="408" y="10" fill="#94a3b8" font-size="9">application</text>
+      </g>
+    </svg>
+    <div class="legend">
+      <span><span class="box" style="background:rgba(251,146,60,.3);border:1px solid #fb923c"></span>input representations</span>
+      <span><span class="box" style="background:rgba(34,211,238,.4);border:1px solid #22d3ee"></span>latent conditioning</span>
+      <span><span class="box" style="background:rgba(76,29,149,.4);border:1px solid #a78bfa"></span>model / uncertainty</span>
+      <span><span class="box" style="background:rgba(251,113,133,.4);border:1px solid #fb7185"></span>outputs</span>
+      <span><span class="box" style="background:rgba(52,211,153,.4);border:1px solid #34d399"></span>applications</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ KEY NUMBERS ============ -->
+<section>
+  <h2>核心数字</h2>
+  <div class="cards">
+    <div class="card">
+      <h3><span class="dot" style="background:var(--emerald)"></span>性能 (DL3DV @6 views)</h3>
+      <ul>
+        <li>3DGS 输入 PSNR 17.65 (胜专用 3DGS-Enhancer 16.94)</li>
+        <li>mesh 输入 17.95 · 稀疏点云 17.74</li>
+        <li>9 views: 3DGS 19.76 · mesh 19.86 · points 19.72</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot" style="background:var(--violet)"></span>几何一致性 (Flow-DPO)</h3>
+      <ul>
+        <li>AUC@5°: 61.12 → 68.32 (+7.2%)</li>
+        <li>COLMAP 位姿恢复作 reward</li>
+        <li>零推理开销 (baked 进 LoRA)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot" style="background:var(--amber)"></span>数据与算力</h3>
+      <ul>
+        <li>20 对视频即有效 (vs prior 80K–150K 图像对)</li>
+        <li>LoRA rank-64, &lt;1% 参数, 1×H100</li>
+        <li>SFT 3000 iter + DPO 2000 iter</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot" style="background:var(--cyan)"></span>工程指标</h3>
+      <ul>
+        <li>mask: +1.3 dB PSNR</li>
+        <li>5 denoising steps: 31 s/61帧 (10× 加速)</li>
+        <li>不确定性: 25.7 vs 14.4 dB (自信 vs 不自信)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ METHOD ============ -->
+<section>
+  <h2>方法: 两阶段轻量适配</h2>
+
+  <h3><span class="tag v">Stage I</span> 监督微调 (SFT) — 通道拼接 + LoRA</h3>
+  <div class="formula"><span class="lbl">rectified flow 加噪 + 通道拼接 conditioning</span>
+    z_t = (1−t)·z_0 + t·ε, &nbsp; ε ~ N(0, I) &nbsp;&nbsp;→&nbsp;&nbsp; ẑ_t = [z_t ; z_cond ; m]
+  </div>
+  <div class="formula"><span class="lbl">flow matching 目标 (模型预测速度场 v = ε − z_0)</span>
+    L_FM = E[ ‖ v − v_θ(ẑ_t, t) ‖² ]
+  </div>
+  <p class="small muted">LoRA rank-64 更新 &lt;1% 参数, VAE 和基座冻结。任务比"从零生成视频"窄 — 只需学会 condition 在劣化输入上, 因此 20 对视频就够。</p>
+
+  <h3><span class="tag v">Mask</span> 该信谁, 该修谁</h3>
+  <p class="small">m=1 (训练视角): 保留不动, 防幻觉; m=0 (劣化帧): 修复。干净帧成为 anchor, 向相邻帧传播外观/光照/结构。无 mask 时模型分不清干净帧与轻度劣化帧, PSNR −1.3 dB。</p>
+
+  <h3><span class="tag r">Stage II</span> Flow-DPO — 位姿精度作 reward</h3>
+  <div class="formula"><span class="lbl">偏好优化 (Δ = 当前模型与 SFT reference 在流速预测上的 L2 差)</span>
+    L_DPO = −E[ log σ( −β/2 · (Δ_w − Δ_l) ) ]
+  </div>
+  <p class="small muted">reward = COLMAP (SuperPoint + LightGlue) 从输出恢复的相机位姿 AUC@5°; 每个场景 5 seeds 采样, 保留 AUC gap ≥ 0.2 的配对。解决"单帧合理但跨视图不一致"的幻觉。AUC@5° 61.1 → 68.3, PSNR 17.51 → 17.65, 零推理开销。</p>
+</section>
+
+<!-- ============ EXPERIMENTS ============ -->
+<section>
+  <h2>实验结果</h2>
+
+  <h3>DL3DV 对比 (FixAnything 单模型, 四种输入)</h3>
+  <table>
+    <tr><th>Method</th><th class="num">3v PSNR</th><th class="num">3v LPIPS</th><th class="num">6v PSNR</th><th class="num">6v LPIPS</th><th class="num">9v PSNR</th><th class="num">9v LPIPS</th></tr>
+    <tr><td>3DGS (sparse)</td><td class="num">10.97</td><td class="num">0.567</td><td class="num">13.34</td><td class="num">0.498</td><td class="num">14.99</td><td class="num">0.446</td></tr>
+    <tr><td>FSGS (best sparse)</td><td class="num">12.22</td><td class="num">0.535</td><td class="num">13.73</td><td class="num">0.540</td><td class="num">15.52</td><td class="num">0.416</td></tr>
+    <tr><td>3DGS-Enhancer</td><td class="num">14.33</td><td class="num">0.464</td><td class="num">16.94</td><td class="num">0.356</td><td class="num">18.50</td><td class="num">0.305</td></tr>
+    <tr><td>Xu et al.</td><td class="num">14.62</td><td class="num">0.491</td><td class="num">17.35</td><td class="num">0.396</td><td class="num">19.19</td><td class="num">0.335</td></tr>
+    <tr><td>Difix3D+</td><td class="num">12.37</td><td class="num">0.512</td><td class="num">14.41</td><td class="num">0.400</td><td class="num">16.39</td><td class="num">0.330</td></tr>
+    <tr><td><b>FixAnything w/ 3DGS</b></td><td class="num best">15.18</td><td class="num best">0.408</td><td class="num best">17.65</td><td class="num best">0.289</td><td class="num best">19.76</td><td class="num best">0.269</td></tr>
+    <tr><td>FixAnything w/ mesh</td><td class="num best">15.74</td><td class="num best">0.366</td><td class="num best">17.95</td><td class="num best">0.269</td><td class="num best">19.86</td><td class="num best">0.233</td></tr>
+    <tr><td>FixAnything w/ 稀疏点云</td><td class="num">15.52</td><td class="num">0.381</td><td class="num">17.74</td><td class="num">0.271</td><td class="num">19.72</td><td class="num">0.241</td></tr>
+  </table>
+  <div class="note"><b>读表:</b> ①3DGS 输入全面超过为 3DGS 定制的专用管线 (3DGS-Enhancer / Xu et al. / Difix3D+); ②mesh 输入最好, 稀疏 COLMAP 点云几乎持平 — 输入视觉信息远少于 3DGS 也能修到相当质量; ③"渲染主要起结构脚手架作用, 视频先验负责填内容"。</div>
+
+  <h3>消融 (DL3DV, 6 views)</h3>
+  <div class="two-col">
+    <div>
+      <h3>Flow-DPO 的贡献</h3>
+      <table>
+        <tr><th>Method</th><th class="num">PSNR↑</th><th class="num">SSIM↑</th><th class="num">LPIPS↓</th><th class="num">AUC@5°↑</th></tr>
+        <tr><td>SFT only</td><td class="num">17.51</td><td class="num">0.554</td><td class="num">0.296</td><td class="num">61.12</td></tr>
+        <tr><td><b>+DPO</b></td><td class="num best">17.65</td><td class="num best">0.561</td><td class="num best">0.289</td><td class="num best">68.32</td></tr>
+      </table>
+      <p class="small muted">图像指标温和提升, 主要增益在几何一致性 (+7.2% AUC), 零推理成本。</p>
+    </div>
+    <div>
+      <h3>Mask 的贡献</h3>
+      <table>
+        <tr><th>Variant</th><th class="num">PSNR↑</th><th class="num">SSIM↑</th><th class="num">LPIPS↓</th></tr>
+        <tr><td>No mask</td><td class="num">16.37</td><td class="num">0.525</td><td class="num">0.311</td></tr>
+        <tr><td><b>With mask</b></td><td class="num best">17.65</td><td class="num best">0.561</td><td class="num best">0.289</td></tr>
+      </table>
+      <p class="small muted">+1.3 dB PSNR — 模型能区分"本来就干净"与"需修复"的帧。</p>
+    </div>
+  </div>
+
+  <h3>数据效率 & 推理速度</h3>
+  <div class="two-col">
+    <div>
+      <table>
+        <tr><th>Training vids</th><th class="num">PSNR</th><th class="num">SSIM</th><th class="num">LPIPS</th></tr>
+        <tr><td>20</td><td class="num">16.70</td><td class="num">0.531</td><td class="num">0.309</td></tr>
+        <tr><td>100</td><td class="num">17.45</td><td class="num">0.556</td><td class="num">0.292</td></tr>
+        <tr><td>500</td><td class="num best">17.65</td><td class="num best">0.561</td><td class="num best">0.289</td></tr>
+      </table>
+      <p class="small muted">20 对即有效, 100 对后边际收益递减。</p>
+    </div>
+    <div>
+      <table>
+        <tr><th>Steps</th><th class="num">PSNR</th><th class="num">Time (s)</th></tr>
+        <tr><td>5</td><td class="num best">18.02</td><td class="num">31</td></tr>
+        <tr><td>10</td><td class="num">17.91</td><td class="num">62</td></tr>
+        <tr><td>25</td><td class="num">17.75</td><td class="num">155</td></tr>
+        <tr><td>50</td><td class="num">17.65</td><td class="num">309</td></tr>
+      </table>
+      <p class="small muted">5 steps 足够, 10× 加速 (61帧@480×832, H100)。</p>
+    </div>
+  </div>
+
+  <div class="note"><b>诚实读数:</b> ①评估限于 DL3DV (航拍/大场景为主) 的 20 个 held-out 场景, 室内小物体覆盖少; ②跨数据集 (MipNeRF-360/LLFF) 结果只在 supplementary; ③不确定性分析是 preliminary (5 seeds 简单 std), 无系统校准。对外陈述用"3DGS 输入 6 views PSNR 17.65 超过专用管线 + AUC@5° 提升 7.2% + 20 对视频即可训练"。</div>
+</section>
+
+<!-- ============ COMPARISON ============ -->
+<section>
+  <h2>与相关工作对比</h2>
+  <table>
+    <tr><th>方法</th><th>表示</th><th>机制</th><th>数据量</th><th>3D 一致</th><th>代码</th></tr>
+    <tr><td>Nerfbusters</td><td>NeRF</td><td>3D diffusion 正则化几何</td><td>大</td><td>隐式</td><td>✓</td></tr>
+    <tr><td>ReconFusion</td><td>NeRF</td><td>PixelNeRF 条件逐视角生成</td><td>大</td><td>隐式</td><td>✓</td></tr>
+    <tr><td>Difix3D+</td><td>图像</td><td>参考视角单步 image diffusion</td><td>80K+ 对</td><td>弱 (逐图)</td><td>✓</td></tr>
+    <tr><td>3DGS-Enhancer</td><td>3DGS</td><td>视频 LDM + 定制时空 decoder</td><td>150K 对</td><td>中等</td><td>✓</td></tr>
+    <tr><td>ViewCrafter / GEN3C</td><td>点云</td><td>相机控制视频生成 (显式 SE(3))</td><td>大</td><td>中等</td><td>✓</td></tr>
+    <tr><td>FlowR</td><td>稀疏重建</td><td>多视角 flow matching</td><td>大</td><td>中等</td><td>✗</td></tr>
+    <tr><td>Epipolar-DPO / VideoGPA</td><td>T2V/I2V</td><td>极几何/重建先验 DPO (concurrent)</td><td>—</td><td>强</td><td>部分</td></tr>
+    <tr><td><b>FixAnything</b></td><td><b>4 种通用</b></td><td><b>Wan2.1 + LoRA + mask + Flow-DPO</b></td><td><b>20–500 视频</b></td><td><b>强 (位姿 reward)</b></td><td>✗ coming soon</td></tr>
+  </table>
+  <p class="small muted">定位: 第一个"通用"渲染清理模型 — 不针对特定表示、无架构改动、数据需求低两个数量级。三个贡献: 表示无关的形式化、mask-aware conditioning、几何一致性偏好优化。</p>
+</section>
+
+<!-- ============ LIMITS ============ -->
+<section>
+  <h2>局限性与工程注意</h2>
+  <div class="limitation"><b>论文自认:</b> ①幻觉不可避免 — 模型必须在未观测区域"发明"内容, 只在"与已有观测矛盾"时才算失败; ②不确定性分析是 preliminary (5 seeds std), 无系统校准; ③长轨迹靠 61 帧分块, chunk 边界一致性靠共享 anchor, 有理论限制; ④评估以 DL3DV 大场景为主。</div>
+  <div class="limitation"><b>工程视角 (我的补充):</b> ①代码未开源 (Coming Soon) — 与 PhysGS 同样问题, 复现要等官方 release; ②推理开销 — 31s/61帧 (H100, 5 steps), 视频扩散模型注定是离线预处理, 不是在线渲染; ③依赖 mask 标注 — 要知道训练视角集合与位姿, 位姿噪声会污染 mask; ④输出分辨率 480×832, 对需要高分辨率渲染的任务可能不够; ⑤20 对视频是"能用"不是"好用", 500 对才有完整效果。</div>
+</section>
+
+<!-- ============ FOR US ============ -->
+<section>
+  <h2>对机器人项目的意义</h2>
+  <div class="takeaway"><b>补 GaussGym 渲染质量短板:</b> GaussGym 用 3DGS 渲染器训练机器人, 稀疏扫描的 floaters 会污染视觉策略训练。FixAnything (3DGS 输入版, PSNR 17.65 @6 views) 可做离线清洗: 扫描 → 3DGS → 渲染轨迹 → 修复 → 干净训练视觉流。</div>
+  <div class="takeaway"><b>稀疏点云路线可能跳过中间重建:</b> FixAnything 证明 COLMAP 稀疏点云 + 视频先验就能出高质量渲染 (19.72 PSNR @9 views)。我们的扫描管线可以渲染点云轨迹 + 生成式修复, 省掉 NKSR mesh / 3DGS 训练 — 与 [[physical-property-estimation-from-scans]] 的结论呼应。</div>
+  <div class="takeaway"><b>不确定性 = 补扫引导:</b> 5-seed std 标出"模型在编"的区域 (弱观测区域), 指导哪里再多拍几张照片, 或把高不确定区域排除出策略训练采样。</div>
+  <div class="takeaway"><b>与 PhysGS 互补:</b> PhysGS 需要干净的 3DGS 重建才能准确估计物理属性; FixAnything 清洗后的渲染/重建可作 PhysGS 的输入增强。三篇综述 (GaussGym → PhysGS → FixAnything) 构成"场景获取 → 物理标注 → 渲染质量"的完整闭环。</div>
+  <div class="takeaway"><b>落地路径:</b> 等代码开源 → 用 GaussGym 扫描输出 (COLMAP 点云或 3DGS 渲染) 跑离线清洗 → 对比清洗前后策略训练表现。注意 31s/61帧 意味着批量离线, 不是实时。</div>
+</section>
+
+</main>
+
+<footer>
+  FixAnything: 3D-Consistent Rendering Refinement via Video Generative Priors · Vuong, Ramanan, Narasimhan (CMU) · ECCV 2026 · arXiv:2608.23549 · 报告入库: 3d-sim-wiki concepts/fixanything.md · 2026-08-31
+</footer>
+
+</body>
+</html>

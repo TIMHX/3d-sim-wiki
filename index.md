@@ -19,8 +19,8 @@ tags: [meta]
 
 ## Concepts
 
-- [[fixanything|FixAnything: 视频生成先验修复 3D 渲染伪影]] — ECCV 2026，单视频扩散模型(Wan2.1+LoRA+Flow-DPO)修复 3DGS/NeRF/mesh/点云渲染伪影，literature review 报告
-- [[physgs|PhysGS: Bayesian 3DGS 逐点物理属性估计]] — CVPR 2026，Dirichlet+NIG Bayesian 融合 GPT-5 先验估逐点摩擦/硬度/密度/质量 + 不确定性，literature review 报告
+- [[fixanything|FixAnything: 视频生成先验修复 3D 渲染伪影]] — ECCV 2026，单视频扩散模型(Wan2.1+LoRA+Flow-DPO)修复 3DGS/NeRF/mesh/点云渲染伪影，literature review 报告（演讲 HTML：reports/fixanything/index.html）
+- [[physgs|PhysGS: Bayesian 3DGS 逐点物理属性估计]] — CVPR 2026，Dirichlet+NIG Bayesian 融合 GPT-5 先验估逐点摩擦/硬度/密度/质量 + 不确定性，literature review 报告（演讲 HTML：reports/physgs/index.html）
 - [[gaussgym|GaussGym: 3DGS 实景转仿真机器人训练框架]] — 3DGS drop-in renderer + IsaacGym 向量化模拟，100K steps/s 视觉训练，2500 场景，literature review 报告
 - [[physical-property-estimation-from-scans|扫描场景自动物理属性标注（摩擦/粗糙度）]] — PhysGS/Brandao/VLM-RAG/Sim Anything 四路线对比，衔接 PMAT__muXXX 体系的自动摩擦标注方案
 - [[isaaclab-docker-env|IsaacLab Docker Environment (tim-pc)]] — Robot project Isaac Lab docker setup: repo, gh auth isolation, daily commands, GPU verification

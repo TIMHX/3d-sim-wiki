@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhysGS — Bayesian-Inferred Gaussian Splatting for Physical Property Estimation (CVPR 2026)</title>
+<style>
+  :root {
+    --bg: #020617;
+    --panel: #0f172a;
+    --panel2: #1e293b;
+    --line: #334155;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --cyan: #22d3ee;
+    --emerald: #34d399;
+    --violet: #a78bfa;
+    --amber: #fbbf24;
+    --rose: #fb7185;
+    --orange: #fb923c;
+    --slate: #94a3b8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "JetBrains Mono", "SF Mono", Consolas, monospace;
+    line-height: 1.6;
+    padding-bottom: 80px;
+  }
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(30,41,59,.25) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(30,41,59,.25) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  header {
+    padding: 48px 40px 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .pulse { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--emerald); margin-right: 10px; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+  header h1 { font-size: 28px; letter-spacing: -0.5px; }
+  header .sub { color: var(--muted); font-size: 13px; margin-top: 8px; }
+  header .meta { color: var(--muted); font-size: 11px; margin-top: 6px; }
+  main { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+  section { margin: 40px 0; }
+  h2 { font-size: 20px; color: var(--cyan); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+  h2::before { content: ""; width: 8px; height: 8px; background: var(--cyan); border-radius: 2px; }
+  h3 { font-size: 15px; color: var(--text); margin: 24px 0 10px; }
+  p, li { font-size: 13px; color: var(--text); }
+  .muted { color: var(--muted); }
+  .small { font-size: 11px; }
+  .diagram-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 20px;
+    overflow-x: auto;
+  }
+  .diagram-card svg { display: block; margin: 0 auto; min-width: 900px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 20px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px; }
+  .card h3 { font-size: 13px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .card ul { list-style: none; }
+  .card li { font-size: 12px; color: var(--muted); padding: 4px 0; border-bottom: 1px dashed rgba(51,65,85,.5); }
+  .card li:last-child { border-bottom: none; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 12px 0; }
+  th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: normal; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; }
+  td.num { font-variant-numeric: tabular-nums; }
+  .best { color: var(--emerald); font-weight: bold; }
+  .formula { background: var(--panel2); border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; font-size: 13px; margin: 10px 0; overflow-x: auto; white-space: nowrap; color: var(--violet); }
+  .formula .lbl { color: var(--muted); font-size: 11px; display: block; margin-bottom: 6px; }
+  .tag { display: inline-block; background: rgba(34,211,238,.1); color: var(--cyan); border: 1px solid rgba(34,211,238,.3); border-radius: 4px; padding: 1px 8px; font-size: 11px; margin-right: 6px; }
+  .tag.g { color: var(--emerald); background: rgba(52,211,153,.1); border-color: rgba(52,211,153,.3); }
+  .tag.v { color: var(--violet); background: rgba(167,139,250,.1); border-color: rgba(167,139,250,.3); }
+  .tag.a { color: var(--amber); background: rgba(251,191,36,.1); border-color: rgba(251,191,36,.3); }
+  .tag.r { color: var(--rose); background: rgba(251,113,133,.1); border-color: rgba(251,113,133,.3); }
+  .limitation { border-left: 3px solid var(--rose); padding: 10px 16px; background: rgba(251,113,133,.06); border-radius: 0 8px 8px 0; margin: 10px 0; font-size: 12px; }
+  .takeaway { border-left: 3px solid var(--emerald); padding: 10px 16px; background: rgba(52,211,153,.06); border-radius: 0 8px 8px 0; margin: 10px 0; font-size: 12px; }
+  .note { border-left: 3px solid var(--amber); padding: 10px 16px; background: rgba(251,191,36,.06); border-radius: 0 8px 8px 0; margin: 10px 0; font-size: 12px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+  footer { max-width: 1200px; margin: 60px auto 0; padding: 20px 40px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; font-size: 11px; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend .box { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+</style>
+</head>
+<body class="grid-bg">
+
+<header>
+  <div><span class="pulse"></span><span style="font-size:12px;color:var(--muted)">LITERATURE REVIEW · ROBOTICS PROJECT · 2026-08-31</span></div>
+  <h1 style="margin-top:10px">PhysGS: Bayesian-Inferred Gaussian Splatting<br>for Physical Property Estimation</h1>
+  <div class="sub">从多视角 RGB + VLM 先验, 用 Bayesian 推断估计 3DGS 逐点物理属性 (摩擦/硬度/刚度/密度/质量), 并输出校准的不确定性</div>
+  <div class="meta">
+    <span class="tag">CVPR 2026</span><span class="tag g">arXiv:2511.18570</span><span class="tag v">UMD</span><span class="tag a">代码未开源</span>
+    Chopra · Liang · Seneviratne · Manocha — University of Maryland, College Park
+  </div>
+</header>
+
+<main>
+
+<!-- ============ ARCHITECTURE ============ -->
+<section>
+  <h2>系统架构</h2>
+  <div class="diagram-card">
+    <svg viewBox="0 0 1200 640" xmlns="http://www.w3.org/2000/svg" font-family="'JetBrains Mono',Consolas,monospace">
+      <defs>
+        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+          <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+        </pattern>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+        </marker>
+        <marker id="arrow-cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#22d3ee"/>
+        </marker>
+      </defs>
+      <rect width="1200" height="640" fill="url(#grid)"/>
+
+      <!-- TITLE -->
+      <text x="600" y="30" text-anchor="middle" fill="#e2e8f0" font-size="15" font-weight="bold">PhysGS: Bayesian Inference over Gaussian Splats</text>
+
+      <!-- ===== INPUT ===== -->
+      <g>
+        <rect x="40" y="60" width="240" height="110" rx="8" fill="#0f172a" stroke="#34d399" stroke-width="1.5"/>
+        <rect x="40" y="60" width="240" height="110" rx="8" fill="rgba(6,78,59,0.4)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="160" y="84" text-anchor="middle" fill="#34d399" font-size="12" font-weight="bold">Input</text>
+        <text x="160" y="108" text-anchor="middle" fill="#e2e8f0" font-size="10">Multi-view RGB images</text>
+        <text x="160" y="124" text-anchor="middle" fill="#94a3b8" font-size="9">+ camera info</text>
+        <text x="160" y="148" text-anchor="middle" fill="#94a3b8" font-size="9">GPT-5 VLM as prior</text>
+      </g>
+
+      <!-- ===== SAM ===== -->
+      <g>
+        <rect x="340" y="60" width="240" height="110" rx="8" fill="#0f172a" stroke="#fbbf24" stroke-width="1.5"/>
+        <rect x="340" y="60" width="240" height="110" rx="8" fill="rgba(120,53,15,0.3)" stroke="#fbbf24" stroke-width="1.5"/>
+        <text x="460" y="84" text-anchor="middle" fill="#fbbf24" font-size="12" font-weight="bold">SAM Segmentation</text>
+        <text x="460" y="108" text-anchor="middle" fill="#e2e8f0" font-size="10">Whole / Part / Sub-part masks</text>
+        <text x="460" y="124" text-anchor="middle" fill="#94a3b8" font-size="9">Hierarchical material decomposition</text>
+        <text x="460" y="148" text-anchor="middle" fill="#94a3b8" font-size="9">IoU + stability filtering</text>
+      </g>
+
+      <!-- ===== VLM PROMPT ===== -->
+      <g>
+        <rect x="640" y="60" width="240" height="110" rx="8" fill="#0f172a" stroke="#22d3ee" stroke-width="1.5"/>
+        <rect x="640" y="60" width="240" height="110" rx="8" fill="rgba(8,51,68,0.4)" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="760" y="84" text-anchor="middle" fill="#22d3ee" font-size="12" font-weight="bold">VLM Prompting</text>
+        <text x="760" y="108" text-anchor="middle" fill="#e2e8f0" font-size="10">3-image triplet per part</text>
+        <text x="760" y="124" text-anchor="middle" fill="#94a3b8" font-size="9">full + mask-overlay + isolated</text>
+        <text x="760" y="148" text-anchor="middle" fill="#94a3b8" font-size="9">→ material, property, confidence p</text>
+      </g>
+
+      <!-- ===== BAYESIAN CORE ===== -->
+      <g>
+        <rect x="940" y="60" width="220" height="110" rx="8" fill="#0f172a" stroke="#a78bfa" stroke-width="2"/>
+        <rect x="940" y="60" width="220" height="110" rx="8" fill="rgba(76,29,149,0.4)" stroke="#a78bfa" stroke-width="2"/>
+        <text x="1050" y="84" text-anchor="middle" fill="#a78bfa" font-size="12" font-weight="bold">Bayesian Inference</text>
+        <text x="1050" y="108" text-anchor="middle" fill="#e2e8f0" font-size="10">Dirichlet–Categorical</text>
+        <text x="1050" y="124" text-anchor="middle" fill="#94a3b8" font-size="9">material class posterior</text>
+        <text x="1050" y="146" text-anchor="middle" fill="#e2e8f0" font-size="10">Normal–Inverse–Gamma</text>
+        <text x="1050" y="162" text-anchor="middle" fill="#94a3b8" font-size="9">property + aleatoric/epistemic</text>
+      </g>
+
+      <!-- arrows row 1 -->
+      <line x1="280" y1="115" x2="338" y2="115" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <line x1="580" y1="115" x2="638" y2="115" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <line x1="880" y1="115" x2="938" y2="115" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+      <!-- ===== OBSERVATIONS ===== -->
+      <g>
+        <rect x="40" y="250" width="400" height="100" rx="8" fill="#0f172a" stroke="#94a3b8" stroke-width="1.5"/>
+        <rect x="40" y="250" width="400" height="100" rx="8" fill="rgba(30,41,59,0.5)" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="240" y="274" text-anchor="middle" fill="#94a3b8" font-size="12" font-weight="bold">Confidence-Weighted Observations</text>
+        <text x="240" y="300" text-anchor="middle" fill="#e2e8f0" font-size="10.5">Oₘ = (cₘ, pₘ, ψₘ)</text>
+        <text x="240" y="318" text-anchor="middle" fill="#94a3b8" font-size="9">class · VLM confidence · property value</text>
+        <text x="240" y="336" text-anchor="middle" fill="#94a3b8" font-size="9">fused across multiple views</text>
+      </g>
+
+      <!-- ===== 3DGS ===== -->
+      <g>
+        <rect x="520" y="250" width="400" height="100" rx="8" fill="#0f172a" stroke="#fb923c" stroke-width="1.5"/>
+        <rect x="520" y="250" width="400" height="100" rx="8" fill="rgba(251,146,60,0.3)" stroke="#fb923c" stroke-width="1.5"/>
+        <text x="720" y="274" text-anchor="middle" fill="#fb923c" font-size="12" font-weight="bold">Semantic 3D Gaussian Splatting</text>
+        <text x="720" y="300" text-anchor="middle" fill="#e2e8f0" font-size="10">Material legend → recolor scenes</text>
+        <text x="720" y="318" text-anchor="middle" fill="#94a3b8" font-size="9">splatfacto-big (Nerfstudio), 20K iter</text>
+        <text x="720" y="336" text-anchor="middle" fill="#94a3b8" font-size="9">RTX A5000 · random scale 2.0</text>
+      </g>
+
+      <!-- ===== OUTPUTS ===== -->
+      <g>
+        <rect x="1000" y="250" width="160" height="100" rx="8" fill="#0f172a" stroke="#fb7185" stroke-width="1.5"/>
+        <rect x="1000" y="250" width="160" height="100" rx="8" fill="rgba(136,19,55,0.4)" stroke="#fb7185" stroke-width="1.5"/>
+        <text x="1080" y="274" text-anchor="middle" fill="#fb7185" font-size="12" font-weight="bold">Outputs</text>
+        <text x="1080" y="300" text-anchor="middle" fill="#e2e8f0" font-size="9.5">Per-point field</text>
+        <text x="1080" y="316" text-anchor="middle" fill="#94a3b8" font-size="9">friction · hardness</text>
+        <text x="1080" y="330" text-anchor="middle" fill="#94a3b8" font-size="9">stiffness · density</text>
+        <text x="1080" y="344" text-anchor="middle" fill="#e2e8f0" font-size="9.5">+ object mass</text>
+      </g>
+
+      <!-- arrows row 2 -->
+      <line x1="240" y1="350" x2="240" y2="390" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <line x1="720" y1="350" x2="720" y2="390" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <!-- VLM obs into bayesian (dashed cyan) -->
+      <line x1="760" y1="170" x2="240" y2="248" stroke="#22d3ee" stroke-width="1.2" stroke-dasharray="4,4" marker-end="url(#arrow-cyan)"/>
+      <line x1="620" y1="350" x2="1080" y2="352" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+      <!-- ===== UNCERTAINTY ===== -->
+      <g>
+        <rect x="40" y="400" width="240" height="110" rx="8" fill="#0f172a" stroke="#a78bfa" stroke-width="1.5"/>
+        <rect x="40" y="400" width="240" height="110" rx="8" fill="rgba(76,29,149,0.3)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="160" y="424" text-anchor="middle" fill="#a78bfa" font-size="11" font-weight="bold">Uncertainty Decomposition</text>
+        <text x="160" y="452" text-anchor="middle" fill="#e2e8f0" font-size="10">Var[ψ] = E[σ²] + Var[μ]</text>
+        <text x="160" y="472" text-anchor="middle" fill="#94a3b8" font-size="9">aleatoric: sensor/class noise</text>
+        <text x="160" y="488" text-anchor="middle" fill="#94a3b8" font-size="9">epistemic: insufficient evidence</text>
+        <text x="160" y="504" text-anchor="middle" fill="#94a3b8" font-size="9">→ interpretable confidence</text>
+      </g>
+
+      <!-- ===== QUERY ===== -->
+      <g>
+        <rect x="360" y="400" width="240" height="110" rx="8" fill="#0f172a" stroke="#fb923c" stroke-width="1.5"/>
+        <rect x="360" y="400" width="240" height="110" rx="8" fill="rgba(251,146,60,0.25)" stroke="#fb923c" stroke-width="1.5"/>
+        <text x="480" y="424" text-anchor="middle" fill="#fb923c" font-size="11" font-weight="bold">Spatial Queries</text>
+        <text x="480" y="452" text-anchor="middle" fill="#e2e8f0" font-size="10">Per-point: property at location</text>
+        <text x="480" y="472" text-anchor="middle" fill="#e2e8f0" font-size="10">Object-level: volume integral</text>
+        <text x="480" y="492" text-anchor="middle" fill="#94a3b8" font-size="9">→ mass from density field</text>
+      </g>
+
+      <!-- ===== APPLICATIONS ===== -->
+      <g>
+        <rect x="680" y="400" width="480" height="110" rx="8" fill="#0f172a" stroke="#34d399" stroke-width="1.5"/>
+        <rect x="680" y="400" width="480" height="110" rx="8" fill="rgba(6,78,59,0.25)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="920" y="424" text-anchor="middle" fill="#34d399" font-size="11" font-weight="bold">Applications</text>
+        <text x="920" y="452" text-anchor="middle" fill="#e2e8f0" font-size="10">Object-scale: ABO-500 mass estimation</text>
+        <text x="920" y="472" text-anchor="middle" fill="#e2e8f0" font-size="10">Indoor: real-world friction + hardness</text>
+        <text x="920" y="492" text-anchor="middle" fill="#e2e8f0" font-size="10">Outdoor: RUGD / RELLIS-3D terrain</text>
+      </g>
+
+      <!-- arrows row 3 -->
+      <line x1="280" y1="455" x2="358" y2="455" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <line x1="600" y1="455" x2="678" y2="455" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <!-- query -> app -->
+      <line x1="480" y1="510" x2="480" y2="540" stroke="#64748b" stroke-width="1.2" stroke-dasharray="4,4" marker-end="url(#arrow)"/>
+      <text x="520" y="556" fill="#94a3b8" font-size="9">3DGS field serves all queries</text>
+
+      <!-- ===== FOOTNOTE BAND ===== -->
+      <rect x="40" y="580" width="1120" height="40" rx="8" fill="rgba(148,163,184,0.08)" stroke="#334155" stroke-width="1"/>
+      <text x="600" y="604" text-anchor="middle" fill="#94a3b8" font-size="10">Unified framework: reconstruction + uncertainty + physical reasoning in one spatially continuous representation</text>
+
+      <!-- LEGEND -->
+      <g transform="translate(40, 630)">
+        <rect x="0" y="0" width="12" height="12" rx="3" fill="rgba(34,211,238,0.4)" stroke="#22d3ee"/><text x="18" y="10" fill="#94a3b8" font-size="9">VLM/vision</text>
+        <rect x="90" y="0" width="12" height="12" rx="3" fill="rgba(76,29,149,0.4)" stroke="#a78bfa"/><text x="108" y="10" fill="#94a3b8" font-size="9">Bayesian</text>
+        <rect x="180" y="0" width="12" height="12" rx="3" fill="rgba(251,146,60,0.3)" stroke="#fb923c"/><text x="198" y="10" fill="#94a3b8" font-size="9">3DGS</text>
+        <rect x="250" y="0" width="12" height="12" rx="3" fill="rgba(251,113,133,0.4)" stroke="#fb7185"/><text x="268" y="10" fill="#94a3b8" font-size="9">output</text>
+        <rect x="330" y="0" width="12" height="12" rx="3" fill="rgba(52,211,153,0.4)" stroke="#34d399"/><text x="348" y="10" fill="#94a3b8" font-size="9">application</text>
+      </g>
+    </svg>
+    <div class="legend">
+      <span><span class="box" style="background:rgba(34,211,238,.4);border:1px solid #22d3ee"></span>VLM / vision prior</span>
+      <span><span class="box" style="background:rgba(76,29,149,.4);border:1px solid #a78bfa"></span>Bayesian core</span>
+      <span><span class="box" style="background:rgba(251,146,60,.3);border:1px solid #fb923c"></span>3D Gaussian Splatting</span>
+      <span><span class="box" style="background:rgba(251,113,133,.4);border:1px solid #fb7185"></span>outputs</span>
+      <span><span class="box" style="background:rgba(52,211,153,.4);border:1px solid #34d399"></span>applications</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ KEY NUMBERS ============ -->
+<section>
+  <h2>核心数字</h2>
+  <div class="cards">
+    <div class="card">
+      <h3><span class="dot" style="background:var(--emerald)"></span>质量估计 (ABO-500)</h3>
+      <ul>
+        <li>APE ↓22.8% <span class="muted small">(1.061 → 0.819)</span></li>
+        <li>ADE ↓5.5% <span class="muted small">(8.730 → 8.254)</span></li>
+        <li>ALDE/MnRE 略逊 NeRF2Physics</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot" style="background:var(--violet)"></span>Shore 硬度 (31 点)</h3>
+      <ul>
+        <li>ADE ↓61.2% <span class="muted small">(34.295 → 12.721)</span></li>
+        <li>ALDE ↓34.4%, APE ↓16.5%</li>
+        <li>MnRE ↑8.4%</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot" style="background:var(--amber)"></span>动摩擦 (6 点)</h3>
+      <ul>
+        <li>ADE ↓15.5%, ALDE ↓18.1%</li>
+        <li>MnRE ↑9.4%</li>
+        <li class="muted small">样本量极小, 统计意义有限</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="dot" style="background:var(--cyan)"></span>Bayesian 更新贡献</h3>
+      <ul>
+        <li>Ablation: ADE ↓5.6%, APE ↓6.4%</li>
+        <li>多视角后验更新 vs 单视角固定</li>
+        <li>不确定性随 SAM 质量自适应</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ METHOD ============ -->
+<section>
+  <h2>方法: 三层 Bayesian 模型</h2>
+
+  <h3><span class="tag v">1</span> 离散材质 — Dirichlet–Categorical (闭式共轭更新)</h3>
+  <div class="formula"><span class="lbl">后验预测 (观测集合 Z 后, 新观测属于材质 i 的概率)</span>
+    f(z = i | Z, α) = ᾱᵢ / Σⱼ ᾱⱼ ,&nbsp;&nbsp; ᾱᵢ ← αᵢ(0) + Σ_{m: cₘ=i} λ·pₘ
+  </div>
+  <p class="small muted">λ = 每条观测的证据强度; pₘ = VLM 置信度。置信度加权 → VLM 越犹豫, 贡献越小; 多候选的置信度分布本身就是语义歧义信号。</p>
+
+  <h3><span class="tag v">2</span> 连续属性 — 置信度加权矩 (流式, 不需存历史)</h3>
+  <div class="formula"><span class="lbl">累加器 + 后验均值/方差</span>
+    Wᵢ = Σ pₘ, &nbsp; Sᵢ = Σ pₘψₘ, &nbsp; Qᵢ = Σ pₘψₘ² &nbsp;→&nbsp; μᵢ = Sᵢ/Wᵢ, &nbsp; σᵢ² = max(Qᵢ/Wᵢ − μᵢ², ε)
+  </div>
+  <div class="formula"><span class="lbl">最终预测 = 高斯混合 (每材质一个 mode, 权重 = Dirichlet 后验)</span>
+    f(ψ | Z, α) = Σᵢ (ᾱᵢ / Σⱼ ᾱⱼ) · N(μᵢ, σᵢ²)
+  </div>
+
+  <h3><span class="tag v">3</span> 不确定性 — Normal–Inverse–Gamma (NIG) 先验</h3>
+  <div class="formula"><span class="lbl">总预测方差分解 (key contribution)</span>
+    Var[ψᵢ] = E[σᵢ²] + Var[μᵢ] = β̃/(ᾱ−1) + E[σᵢ²]/κ̃
+    <br><span class="small" style="color:#94a3b8">aleatoric: 类内观测噪声 &nbsp;·&nbsp; epistemic: 证据不足/冲突, 随高置信证据增加而下降</span>
+  </div>
+  <p class="small muted">NIG 闭式更新: κ̃=κ+pₘ, τ̃=(κτ+pₘψₘ)/(κ+pₘ), ᾱ=α+pₘ/2, β̃=β+pₘκ(ψₘ−τ)²/(2(κ+pₘ)) — 全部在线增量, 适合 streaming 重建。</p>
+</section>
+
+<!-- ============ EXPERIMENTS ============ -->
+<section>
+  <h2>实验结果</h2>
+
+  <h3>质量估计 (ABO-500 test, 100 物体)</h3>
+  <table>
+    <tr><th>Method</th><th class="num">ADE ↓</th><th class="num">ALDE ↓</th><th class="num">APE ↓</th><th class="num">MnRE ↑</th></tr>
+    <tr><td>Image2mass</td><td class="num">12.496</td><td class="num">1.792</td><td class="num">0.976</td><td class="num">0.341</td></tr>
+    <tr><td>2D CNN (ResNet50)</td><td class="num">15.431</td><td class="num">1.609</td><td class="num">14.459</td><td class="num">0.362</td></tr>
+    <tr><td>LLaVA</td><td class="num">17.328</td><td class="num">1.893</td><td class="num">1.837</td><td class="num">0.306</td></tr>
+    <tr><td>NeRF2Physics</td><td class="num">8.730</td><td class="num best">0.771</td><td class="num">1.061</td><td class="num best">0.552</td></tr>
+    <tr><td><b>PhysGS</b></td><td class="num best">8.254</td><td class="num">0.999</td><td class="num best">0.819</td><td class="num">0.474</td></tr>
+  </table>
+
+  <div class="two-col">
+    <div>
+      <h3>Shore 硬度 (31 点 / 11 物体)</h3>
+      <table>
+        <tr><th>Method</th><th class="num">ADE ↓</th><th class="num">ALDE ↓</th><th class="num">APE ↓</th><th class="num">MnRE ↑</th></tr>
+        <tr><td>GPT-4V</td><td class="num">32.752</td><td class="num">0.330</td><td class="num">0.304</td><td class="num">0.758</td></tr>
+        <tr><td>CLIP</td><td class="num">32.857</td><td class="num">0.294</td><td class="num">0.266</td><td class="num">0.774</td></tr>
+        <tr><td>NeRF2Physics</td><td class="num">34.295</td><td class="num">0.315</td><td class="num">0.276</td><td class="num">0.765</td></tr>
+        <tr><td><b>PhysGS</b></td><td class="num best">12.721</td><td class="num best">0.193</td><td class="num best">0.222</td><td class="num best">0.839</td></tr>
+      </table>
+    </div>
+    <div>
+      <h3>动摩擦 (6 点 / 6 物体)</h3>
+      <table>
+        <tr><th>Method</th><th class="num">ADE ↓</th><th class="num">ALDE ↓</th><th class="num">APE ↓</th><th class="num">MnRE ↑</th></tr>
+        <tr><td>GPT-4V</td><td class="num">0.209</td><td class="num">0.430</td><td class="num">0.549</td><td class="num">0.692</td></tr>
+        <tr><td>CLIP</td><td class="num">0.222</td><td class="num">0.455</td><td class="num">0.602</td><td class="num">0.654</td></tr>
+        <tr><td>NeRF2Physics</td><td class="num">0.155</td><td class="num">0.321</td><td class="num best">0.360</td><td class="num">0.736</td></tr>
+        <tr><td><b>PhysGS</b></td><td class="num best">0.131</td><td class="num best">0.263</td><td class="num">0.365</td><td class="num best">0.805</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="note"><b>诚实读数:</b> 摩擦只有 6 个测量点, 硬度 31 点, 都是小样本。质量估计在 ALDE/MnRE 上反而略输 NeRF2Physics (0.999 vs 0.771, 0.474 vs 0.552), 论文没有解释这一点。对外陈述用"质量 APE 降 22.8% / 硬度 ADE 降 61.2% / 摩擦 ALDE 降 18.1%"即可, 不要声称全面超越。</div>
+
+  <h3>户外泛化 (RUGD / RELLIS-3D, qualitative)</h3>
+  <p class="small">单张 RGB 出材质分割 + 摩擦 + Young's modulus + 总不确定性。杂乱场景 (枯叶 vs 木头, 泥 vs 草) SAM 分不干净 → 不确定度显著升高; 均匀大表面 (砾石, 草地) → 低不确定度 + 稳定预测。即不确定性对分割质量敏感, 能如实反映证据可信度 — 这是 "calibrated" 的证据。</p>
+</section>
+
+<!-- ============ COMPARISON ============ -->
+<section>
+  <h2>与相关工作对比</h2>
+  <table>
+    <tr><th>方法</th><th>表示</th><th>机制</th><th>不确定性</th><th>多属性</th><th>代码</th></tr>
+    <tr><td>NeRF2Physics (ICRA'24)</td><td>NeRF</td><td>语言嵌入空间 + zero-shot kernel regression</td><td>✗</td><td>✓</td><td>✓</td></tr>
+    <tr><td>GaussianProperty</td><td>3DGS</td><td>同 NeRF2Physics 思路搬上高斯球</td><td>✗</td><td>✓</td><td>部分</td></tr>
+    <tr><td>LERF / LangSplat</td><td>NeRF/3DGS</td><td>CLIP 特征蒸馏成可查询 3D 语言场</td><td>✗</td><td>语义非物理</td><td>✓</td></tr>
+    <tr><td>EVORA</td><td>2D 图</td><td>evidential traction 分布</td><td>✓ (aleatoric+epistemic)</td><td>摩擦为主</td><td>✓</td></tr>
+    <tr><td>Ewen et al.</td><td>2D 图</td><td>语义 + 连续属性联合信念</td><td>✓</td><td>摩擦为主</td><td>✗</td></tr>
+    <tr><td>STEP</td><td>2D 图</td><td>CVaR 风险规划 (DARPA SubT)</td><td>✓</td><td>traversability</td><td>✗</td></tr>
+    <tr><td><b>PhysGS</b></td><td><b>3DGS</b></td><td><b>Dirichlet + NIG Bayesian 融合 VLM 先验</b></td><td><b>✓ 完整分解</b></td><td><b>✓ 5 种属性</b></td><td>✗ coming soon</td></tr>
+  </table>
+  <p class="small muted">定位: 第一个把完整分层 Bayesian 推断嵌入 3DGS 的工作, 同时覆盖点级 + 物体级, 室内 + 室外。NeRF2Physics 是直接前身和最强 baseline, PhysGS 用 3DGS 的显式性 + 可查询性 + 不确定性换掉了 NeRF 的隐式场。</p>
+</section>
+
+<!-- ============ LIMITS ============ -->
+<section>
+  <h2>局限性与工程注意</h2>
+  <div class="limitation"><b>论文自认:</b> ①对 SAM 分割质量敏感 — mask 合并视觉相似材质时属性估计继承歧义, 未来方向是 VLM-guided 分割细化; ②阴影演化未建模; ③材质参数靠手工设定, 无自动赋值。</div>
+  <div class="limitation"><b>工程视角 (我的补充):</b> ①代码未开源 — "Coming Soon" 停在论文版, 复现只能等官方 release; ②GPT-5 闭源商业 API, 每次推理花钱, 换成开源 VLM 性能未知 (无 ablation); ③SAM→GPT-5 两段误差级联, Bayesian 置信度加权只能缓解不能消除; ④"逐点"实际是"逐材质" — 先按材质类估属性再 propagate 到点, 材质分类错则点全错; ⑤评估集小 (6 摩擦点, 15 物体), 户外只有定性。</div>
+</section>
+
+<!-- ============ FOR US ============ -->
+<section>
+  <h2>对机器人项目的意义</h2>
+  <div class="takeaway"><b>输出可直接映射 PMAT__muXXX:</b> 逐点摩擦 → 区域聚合 → PMAT__mu080/mu100 材质名 → 喂 IsaacLab 摩擦解析链, 比手工标注快一个量级。这正是我们 [[physical-property-estimation-from-scans]] 调研里的核心路线之一。</div>
+  <div class="takeaway"><b>不确定性 = 主动采样引导:</b> epistemic 高估的区域就是该去实地测摩擦的地方 — 比单点估计更工程友好, 能指导"哪里值得再标一针"。</div>
+  <div class="takeaway"><b>与 GaussGym 互补:</b> GaussGym 解决"场景怎么来" (扫描 → sim 分钟级), PhysGS 解决"场景物理属性怎么标" (逐点摩擦/硬度), 合起来补上 GaussGym 自认的"资产物理参数统一"短板。</div>
+  <div class="takeaway"><b>落地路径:</b> 等官方代码 → 或参考 EVORA / Ewen et al. 自研路线, 用开源 VLM + 简化 Bayesian 融合自己搭 (VLM+RAG 方案是最快 prototype, 详见 physical-property-estimation 页)。</div>
+</section>
+
+</main>
+
+<footer>
+  PhysGS: Bayesian-Inferred Gaussian Splatting for Physical Property Estimation · Chopra, Liang, Seneviratne, Manocha (UMD) · CVPR 2026 pp.18980-18990 · arXiv:2511.18570 · 报告入库: 3d-sim-wiki concepts/physgs.md · 2026-08-31
+</footer>
+
+</body>
+</html>
