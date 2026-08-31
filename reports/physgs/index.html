@@ -184,14 +184,14 @@
         <text x="310" y="268" fill="#64748b" font-size="9">weight wᵢ = ᾱᵢ/Σⱼᾱⱼ</text>
         <line x1="310" y1="285" x2="410" y2="285" stroke="#64748b" stroke-width="1.2" marker-end="url(#arrow)"/>
 
-        <!-- B2: confidence-weighted moments -->
+        <!-- B2: confidence-weighted accumulators -->
         <g>
           <rect x="412" y="240" width="250" height="90" rx="8" fill="#0f172a" stroke="#a78bfa" stroke-width="1.5"/>
           <rect x="412" y="240" width="250" height="90" rx="8" fill="rgba(76,29,149,0.35)" stroke="#a78bfa" stroke-width="1.5"/>
-          <text x="537" y="260" text-anchor="middle" fill="#a78bfa" font-size="10.5" font-weight="bold">2 · Weighted Moments</text>
+          <text x="537" y="260" text-anchor="middle" fill="#a78bfa" font-size="10.5" font-weight="bold">2 · Weighted Accumulators</text>
           <text x="537" y="278" text-anchor="middle" fill="#e2e8f0" font-size="9.5">continuous property per material</text>
           <text x="537" y="296" text-anchor="middle" fill="#c4b5fd" font-size="9.5">W=Σp · S=Σpψ · Q=Σpψ²</text>
-          <text x="537" y="314" text-anchor="middle" fill="#94a3b8" font-size="8.5">μᵢ=S/W · σᵢ²=Q/W−μᵢ²</text>
+          <text x="537" y="314" text-anchor="middle" fill="#94a3b8" font-size="8.5">running mean μᵢ=S/W · var σᵢ²=Q/W−μᵢ²</text>
         </g>
         <text x="662" y="268" fill="#64748b" font-size="9">per-class Gaussian N(μᵢ,σᵢ²)</text>
         <line x1="662" y1="285" x2="762" y2="285" stroke="#64748b" stroke-width="1.2" marker-end="url(#arrow)"/>
@@ -218,7 +218,7 @@
         <!-- mixture formula band -->
         <rect x="60" y="350" width="1084" height="58" rx="8" fill="rgba(167,139,250,0.12)" stroke="#a78bfa" stroke-width="1"/>
         <text x="80" y="372" fill="#c4b5fd" font-size="10.5" font-weight="bold">Gaussian Mixture (Eq. 11):  f(ψ|Z,α) = Σᵢ (ᾱᵢ/Σⱼᾱⱼ) · N(μᵢ, σᵢ²)</text>
-        <text x="80" y="392" fill="#94a3b8" font-size="9">each mode = one material class · weight = Dirichlet posterior · MMSE point estimate = Σ wᵢ μᵢ</text>
+        <text x="80" y="392" fill="#94a3b8" font-size="9">each mode = one material class · weight = Dirichlet posterior · MMSE point estimate = posterior mean μᵢ (A.7)</text>
       </g>
 
       <!-- arrow into 3DGS -->
@@ -357,7 +357,7 @@
   </div>
   <p class="small muted">λ = evidence strength per observation; pₘ = VLM confidence. Confidence weighting means a hesitant VLM contributes less; the confidence distribution across material candidates is itself a signal of semantic ambiguity.</p>
 
-  <h3><span class="tag v">2</span> Continuous property — confidence-weighted moments (streaming, no history storage)</h3>
+  <h3><span class="tag v">2</span> Continuous property — confidence-weighted accumulators (streaming, no history storage)</h3>
   <div class="formula"><span class="lbl">Accumulators + posterior mean/variance</span>
     Wᵢ = Σ pₘ, &nbsp; Sᵢ = Σ pₘψₘ, &nbsp; Qᵢ = Σ pₘψₘ² &nbsp;→&nbsp; μᵢ = Sᵢ/Wᵢ, &nbsp; σᵢ² = max(Qᵢ/Wᵢ − μᵢ², ε)
   </div>

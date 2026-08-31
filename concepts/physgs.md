@@ -55,7 +55,7 @@ PhysGS（Physics Gaussian Splatting）是一个把 **Bayesian 推断嵌进 3D Ga
   - λ 控制每条观测的证据强度，pₘ 是 VLM 置信度
 - **置信度加权**：VLM 越不确定，对后验的贡献越小；多材质候选的置信度分布本身就是语义歧义的信号
 
-### 3.3 连续属性：置信度加权矩累加
+### 3.3 连续属性：置信度加权累加器（confidence-weighted accumulators）
 
 每个材质类 i 维护三个累加器（流式、不需存历史观测）：
 

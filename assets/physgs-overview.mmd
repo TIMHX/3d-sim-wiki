@@ -20,10 +20,10 @@ flowchart TD
     end
 
     subgraph SG_BAYES["Bayesian Inference over Splats (hierarchical: p(z,ψ|Z)=p(ψ|z)·p(z|Z))"]
-        B1["1 · Dirichlet-Categorical: ᾱᵢ = αᵢ(0) + Σ λ·pₘ  →  material posterior wᵢ = ᾱᵢ/Σᾱⱼ"]
-        B2["2 · Confidence-weighted moments: W=Σp, S=Σpψ, Q=Σpψ²  →  μᵢ=S/W, σᵢ²=Q/W−μᵢ²"]
+        B1["1 · Dirichlet-Categorical: ᾱᵢ = αᵢ(0) + Σ λ·pₘ  →  predictive prob. f(z=i) = ᾱᵢ/Σⱼᾱⱼ"]
+        B2["2 · Confidence-weighted accumulators: W=Σp, S=Σpψ, Q=Σpψ²  →  running mean μᵢ=S/W, var σᵢ²=Q/W−μᵢ²"]
         B3["3 · NIG prior: aleatoric=β̃/(ᾱ−1), epistemic=E[σ²]/κ̃"]
-        B4["Gaussian Mixture (Eq. 11): f(ψ|Z,α) = Σᵢ (ᾱᵢ/Σⱼᾱⱼ)·N(μᵢ,σᵢ²)  →  MMSE = Σ wᵢμᵢ"]
+        B4["Gaussian Mixture (Eq. 11): f(ψ|Z,α) = Σᵢ (ᾱᵢ/Σⱼᾱⱼ)·N(μᵢ,σᵢ²)  →  MMSE point estimate = posterior mean (A.7)"]
         B5["streaming: O(1) closed-form updates · no history · cross-view fusion by material-name grouping"]
     end
 
