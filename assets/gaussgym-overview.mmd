@@ -1,0 +1,97 @@
+%% GaussGym Project Overview - presentation panorama
+flowchart TD
+    T["GaussGym: Real-to-Sim Robot Training with 3DGS"]
+
+    subgraph SG_IN["Input Sources"]
+        IN1["iPhone Scans"]
+        IN2["GrandTour Dataset"]
+        IN3["ARKitScenes"]
+        IN4["Veo Video"]
+    end
+
+    subgraph SG_OFF["Offline Pipeline - Scene in Minutes"]
+        VGGT["VGGT: Poses + Point Cloud"]
+        NKSR["NKSR: Collision Mesh"]
+        GSPLAT["gsplat: 3DGS Training"]
+    end
+
+    subgraph SG_RUN["Real-Time Runtime - 4096 Envs, 100K Steps/s"]
+        PHYS["IsaacGym Physics - 50Hz Control"]
+        RENDER["3DGS Renderer - 10Hz Camera"]
+        MBLUR["Motion Blur"]
+        SENSOR["Depth + Heightmap Outputs"]
+    end
+
+    subgraph SG_POL["Policy Learning"]
+        DINO["DinoV2 Embeddings"]
+        PROP["Proprioception"]
+        LSTM["LSTM Encoder"]
+        VOXEL["Voxel Prediction Head"]
+        POLICY["Policy Head - Joint Offsets"]
+    end
+
+    subgraph SG_RES["Results"]
+        R1["RGB Beats Depth - Yellow Patch"]
+        R2["A1 Climbs 17cm Stairs Sim2Real"]
+        R3["Ablations: Voxel, DINO, Scenes"]
+    end
+
+    subgraph SG_REL["Related Research"]
+        R4["PhysGS: Per-Point Friction"]
+        R5["Brandao 2016: Friction From Vision"]
+        R6["VLM + RAG: Zero-Shot CoF"]
+        R7["Sim Anything: Auto Labeling"]
+    end
+
+    subgraph SG_US["For Our Project"]
+        U1["Reuse Scan-to-Sim Pipeline"]
+        U2["Auto Friction Labeling"]
+        U3["PMAT muXXX Profiles"]
+    end
+
+    T --> IN1
+    IN1 --> VGGT
+    IN2 --> VGGT
+    IN3 --> VGGT
+    IN4 --> VGGT
+    VGGT --> NKSR
+    VGGT --> GSPLAT
+    NKSR --> PHYS
+    GSPLAT --> RENDER
+    RENDER --> MBLUR
+    RENDER --> SENSOR
+    PHYS --> SENSOR
+    RENDER -->|RGB Frames| DINO
+    DINO --> LSTM
+    PROP --> LSTM
+    LSTM --> VOXEL
+    LSTM --> POLICY
+    VOXEL -->|Aux Loss| POLICY
+    POLICY --> R1
+    POLICY --> R2
+    POLICY --> R3
+    GSPLAT -.->|3DGS Input| R4
+    GSPLAT -.->|Scan to Sim| U1
+    R4 --> U2
+    R5 --> U2
+    R6 --> U2
+    R7 --> U2
+    U1 --> U2
+    U2 -->|Map CoF| U3
+
+    classDef inp fill:#c8e6c9,stroke:#388e3c;
+    classDef pipe fill:#bbdefb,stroke:#1976d2;
+    classDef run fill:#ffe0b2,stroke:#f57c00;
+    classDef pol fill:#e1bee7,stroke:#8e24aa;
+    classDef res fill:#ffcdd2,stroke:#c62828;
+    classDef rel fill:#d1c4e9,stroke:#5e35b1;
+    classDef us fill:#b2dfdb,stroke:#00796b;
+    classDef title fill:#eceff1,stroke:#455a64;
+    class IN1,IN2,IN3,IN4 inp;
+    class VGGT,NKSR,GSPLAT pipe;
+    class PHYS,RENDER,MBLUR,SENSOR run;
+    class DINO,PROP,LSTM,VOXEL,POLICY pol;
+    class R1,R2,R3 res;
+    class R4,R5,R6,R7 rel;
+    class U1,U2,U3 us;
+    class T title;

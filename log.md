@@ -12,6 +12,14 @@ tags: [meta]
 > Format: `## [YYYY-MM-DD] action | subject`
 > Actions: ingest, update, query, lint, create, archive, delete
 
+## [2026-08-31] ingest | FixAnything literature review (机器人项目)
+- 文献综述第 3 篇：FixAnything（3D-Consistent Rendering Refinement via Video Generative Priors，ECCV 2026，arXiv:2608.23549，CMU Vuong/Ramanan/Narasimhan）
+- 创建 [[fixanything|FixAnything: 视频生成先验修复 3D 渲染伪影]] — 全面报告：单视频扩散模型(Wan2.1-I2V-14B+LoRA rank-64)修复 3DGS/NeRF/mesh/稀疏点云渲染伪影；两阶段(通道拼接+mask SFT → COLMAP 位姿 reward 的 Flow-DPO)；实验数值(3DGS 输入 6v PSNR 17.65 胜专用管线、AUC@5° 61.1→68.3、20 对视频即可训练、5 steps 31s/61帧)；对项目启示(补 GaussGym 渲染短板/稀疏点云跳过中间重建/不确定性引导补扫)
+- Raw 源归档：raw/papers/fixanything-arxiv-2608-23549.md（sha256 frontmatter）、raw/articles/fixanything-website.md
+- 演讲配套：Google Slides "Aug 31, 2026 - checkin (FixAnything)"（9 页，复用 checkin 模板布局）+ 详细 HTML 报告（~/report/fixanything/index.html，dark-themed SVG 架构图）
+- 与已有三篇综述形成闭环：GaussGym(场景获取) → PhysGS(物理标注) → FixAnything(渲染质量)
+- 更新 index.md（Concepts 新增 fixanything，Total pages 17 → 18）
+
 ## [2026-08-31] ingest | PhysGS literature review (机器人项目)
 - 机器人项目导师布置的文献综述第 2 篇：PhysGS（Bayesian-Inferred Gaussian Splatting for Physical Property Estimation，CVPR 2026，arXiv:2511.18570，UMD Chopra et al.）
 - 创建 [[physgs|PhysGS: Bayesian 3DGS 逐点物理属性估计]] — 全面报告：管线(SAM→GPT-5 三图 prompt→Dirichlet-Categorical+NIG Bayesian 融合→语义 3DGS)、方法公式(置信度加权矩/不确定性分解)、实验数值(质量 APE -22.8%、硬度 ADE -61.2%、摩擦 ALDE -18.1%)、对比表(NeRF2Physics/GaussianProperty/EVORA 等)、局限性(代码未开源/GPT-5 依赖/小样本)、对机器人项目启示(PMAT__muXXX 映射/主动采样/GaussGym 互补)
