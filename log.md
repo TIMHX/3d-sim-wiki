@@ -140,3 +140,19 @@ tags: [meta]
 - gaussgym.md 新增"十、延伸"章节 + wikilink
 - Raw 源归档：raw/articles/physgs-website.md、raw/articles/friction-from-vision-brandao-2016.md、raw/articles/vlm-friction-wip-arxiv-2409-09845.md、raw/articles/sim-anything-arxiv-2411-12789.md
 - 更新 index.md（Total pages 15 → 16）
+
+## [2026-09-08] create | pullpop-cloud-particle-retrigger (first-hand, 1 page)
+
+- concepts/[[pullpop-cloud-particle-retrigger]] — NyaPPu PullPop 云粒子只在第一次拉动时出现的完整排查与修复
+- 根因：插件的效果复位 100% 依赖 Write Defaults（`AnimationHelper.AddState` 的 Idle 无 motion，`Effect.anim` 只写 `m_IsActive=1`，clip 长度 0），而 WD 在该 avatar 上不复位 `m_IsActive` → 物体首次打开后永远 active → `playOnAwake` 不再触发。衣服菜单不受影响是因为它走 VRC Parameter Driver
+- 修复：复制 clip 到 `Assets/动画/PullPop Effect (Cloud).anim` 加 `t=0.2 → 0` 关闭帧（0.2s 开→关脉冲），填进组件 `Effect Clip` 字段——不改插件、不加层、不加物体，插件更新不受影响
+- 最大的坑：**Play 模式里脚本 `SetActive` 场景物体会泄漏成 prefab override**（磁盘 `.unity` 里没有），使下次构建时 WD 默认值被捕获成 `true`，制造出"WD 主动写 true"的假象，直接导致一次错误定性。诊断期只做只读观测；用 `PrefabUtility.GetPropertyModifications` + grep 磁盘场景文件核对，`RevertPropertyOverride` 单属性回滚
+- 方法论：Gesture Manager 下 `Animator.GetLayerName` 拿不到 FX 层，须反射 `GestureManager.Module → ModuleVrc3._layers["FX"].Playable`（`AnimatorControllerPlayable`）与 `.Params`（`Vrc3Param.FloatValue()` 是方法）；`EditorApplication.update` + `SessionState` 只读时间线采样器（自限卸载、进 Play 后再装）；`Instantiate + AvatarProcessor.ProcessAvatar + DestroyImmediate` 无损构建探针
+- 附带：PhysBone 自然拉动配方（挂 Chest、3 节真骨链、`allowGrabbing=True`/`grabMovement=0`/`pull=0.2`）；Contact 物体挂在 PhysBone 根下会被当骨链且 `multiChildType=Ignore` 废掉整条链；`_Stretch` 不含方向信息
+- 来源：2026-09-08 通过 Unity MCP（mcp-for-unity 3.4.7）全流程排查，Unity 2022.3.22f1 / Lapwing-min / LapwingBody FT Midnight
+- update：[[unity-mcp-avatar-introspection]] 增「运行时观测（Play 模式）」节；[[lapwing-min-avatar-project]] 增「PullPop 拉动骨换衣」节
+- index 总页数 18 → 19
+
+## [2026-09-08] update | pullpop-cloud-particle-retrigger
+- 用户 Gesture Manager Play 模式实测通过：连续拉动云粒子每次都出，PhysBone 手感可用（后续自行微调 pull/spring/stiffness/链长）
+- 页面状态从「最终验证待补」改为「已验证成功」

@@ -1,7 +1,7 @@
 ---
 title: Lapwing-min Avatar Project (VRChat)
 created: 2026-08-16
-updated: 2026-08-18
+updated: 2026-09-08
 type: summary
 tags: [unity, vrchat, vrchat-avatar, asset-management]
 sources: []
@@ -82,6 +82,15 @@ FX 层：`LapFX FT.controller`（PC）/ `LapFX FT min.controller`（Quest）/ `L
 
 Midnight 的 4 套衣服（BlackWhite/GreenWhite/Black/Brown）合并为单网格 + 材质切换 + 单前沿交叉溶解（复用发色 Hub），详见 [[lapwing-clothes-dissolve|Lapwing 衣服溶解]]。相关：删 3 套 prefab、建替身 `服装/Clothes_Crossfade`（共享骨架）、`Assets/动画/Midnight/Clothes/` 12 个 clip、`LapFX FT Midnight.controller` + `Lapwing Midnight.controller` 各加 Sensor_Clothes/Action_Clothes 两层。
 
+## PullPop 拉动骨换衣（2026-09-08）
+
+`LapwingBody FT Midnight` 上装了 NyaPPu PullPop 1.1.0（`PullPop (Cloud)` 预设），拉胸前动骨 `Pullpop`
+循环切换 `衣服菜单`（Int 0~3，Forward 模式）并播放 pop 音效 + cloud 粒子。
+构建期生成 `PullPop/Gimmick (衣服菜单)`（L60）和 `PullPop/Effect (衣服菜单)`（L61）两层并入 FX。
+
+粒子只在第一次拉动时出现的根因与修复、以及 PhysBone 自然拉动配方，见
+[[pullpop-cloud-particle-retrigger|PullPop 云粒子只触发一次]]。
+
 ## Assets 目录（顶层）
 
 `素体`(Lapwing 身体/衣服/头发/鞋/包 prefab + Hash's_Things FT 变体)、`衣服`(Heather Jacket_Type1/2/OFF × 8 角色、midnightschool 10 色、天使恶魔、oathjacket)、`头发`(long straight hair、Lapwing长发 LowPonytail A/B)、`配件`(AlcoholSet/BlackCatMount/Glitch/STELLA MaruChainGlasses/strongzero StoZero/世界轴/吊坠眼镜/幽灵猫猫/音量发卡)、`妆容`(451 文件)、`动画`、`插件`(ABT/GoGo/GoLoco/MeshDeleterWithTexture/参数压缩器)、`VRCQuestToolsOutput`、根目录 `prefab-id-v1_avtr_*.prefab`（已上传 avatar 副本）。
@@ -97,4 +106,5 @@ VRChat base SDK（com.vrchat.avatars）3.8+：`VRCAvatarDescriptor` 的图层/�
 ## Related
 
 - [[unity-mcp-avatar-introspection|Unity MCP Avatar Introspection]]
+- [[pullpop-cloud-particle-retrigger|PullPop 云粒子只触发一次]]
 - [[index|Wiki Index]]

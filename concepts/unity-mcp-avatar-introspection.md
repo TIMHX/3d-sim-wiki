@@ -1,7 +1,7 @@
 ---
 title: Unity MCP Avatar Introspection
 created: 2026-08-16
-updated: 2026-08-16
+updated: 2026-09-08
 type: concept
 tags: [unity, vrchat, workflow, asset-management]
 sources: []
@@ -53,7 +53,23 @@ confidence: high
 - 场景 Animator 控制器 ≠ playable layers；以 descriptor 的 `baseAnimationLayers`/`specialAnimationLayers` 为准
 - GoLoco/ABT 等插件的 Proxy 控制器（ProxyBase/ProxyAction/ProxySitting）会在构建时被 MA 替换为真实控制器
 
+## 运行时观测（Play 模式）
+
+场景静态结构之外，还需要看**运行时**的动画层状态时：
+
+- **Gesture Manager 下 `Animator.GetLayerName` / `GetCurrentAnimatorStateInfo` 拿不到 FX 层** —— GM 用 PlayableGraph 驱动，
+  avatar 的 `runtimeAnimatorController` 是 null。须反射 `GestureManager.Module → ModuleVrc3._layers["FX"].Playable`
+  （`AnimatorControllerPlayable`）和 `ModuleVrc3.Params`（`Vrc3Param.FloatValue()` 是**方法**不是属性）
+- **只读时间线采样器**：`EditorApplication.update` 回调 + `SessionState` 缓冲，一次装载、用户自由操作、最后一次性取回。
+  回调需 try/catch 且超时自我卸载（动态编译程序集会被卸载）；域重载会清空订阅，必须进 Play 模式**之后**再装
+- **无损构建探针**（不进 Play 模式）：`Instantiate(avatarRoot)` → `nadena.dev.ndmf.AvatarProcessor.ProcessAvatar(clone)`
+  → 读 clone 的 descriptor/controller → `try/finally` 里 `DestroyImmediate`
+- **绝不在 Play 模式里改场景物体**：脚本 `SetActive` 会泄漏成 prefab override 留在场景里，污染后续构建的 WD 默认值。
+  详见 [[pullpop-cloud-particle-retrigger|PullPop 云粒子只触发一次]]
+- 取 inactive 物体用 `Resources.FindObjectsOfTypeAll<T>()`，并以 `gameObject.scene.name != null` 过滤掉资产实例
+
 ## Related
 
 - [[lapwing-min-avatar-project|Lapwing-min Avatar Project]]
+- [[pullpop-cloud-particle-retrigger|PullPop 云粒子只触发一次]]
 - [[index|Wiki Index]]

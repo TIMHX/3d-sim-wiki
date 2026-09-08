@@ -1,7 +1,7 @@
 ---
 title: Wiki Index
 created: 2026-07-22
-updated: 2026-08-24
+updated: 2026-09-08
 type: meta
 tags: [meta]
 ---
@@ -10,7 +10,7 @@ tags: [meta]
 
 > 3D/Simulation/VR knowledge base — Blender, Isaac Lab, Gaussian Splatting, Unity, VRChat.
 > Read this first to find relevant pages for any query.
-> Last updated: 2026-08-31 | Total pages: 18
+> Last updated: 2026-09-08 | Total pages: 19
 
 ## Entities
 
@@ -44,4 +44,5 @@ tags: [meta]
 
 ## Troubleshooting
 
+- [[pullpop-cloud-particle-retrigger|PullPop 云粒子只触发一次]] — WD 不复位 `m_IsActive` 致粒子只播一次:根因、Effect Clip 脉冲修法、Play 模式污染场景的坑、Gesture Manager 反射读实时状态、PhysBone 自然拉动配方
 - [[blender-usd-subdiv-render-levels]] — USD 导出评估渲染级细分(视口 3/渲染 2 导致 4× 面数爆炸)
