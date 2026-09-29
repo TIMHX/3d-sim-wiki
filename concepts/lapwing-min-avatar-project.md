@@ -1,7 +1,7 @@
 ---
 title: Lapwing-min Avatar Project (VRChat)
 created: 2026-08-16
-updated: 2026-09-08
+updated: 2026-09-28
 type: summary
 tags: [unity, vrchat, vrchat-avatar, asset-management]
 sources: []
@@ -90,6 +90,15 @@ Midnight 的 4 套衣服（BlackWhite/GreenWhite/Black/Brown）合并为单网�
 
 粒子只在第一次拉动时出现的根因与修复、以及 PhysBone 自然拉动配方，见
 [[pullpop-cloud-particle-retrigger|PullPop 云粒子只触发一次]]。
+
+## Quest 版 combine min (Android)：雨衣 × B 袖 + 夜店风材质（2026-09-28）
+
+- Quest 只能用 `VRChat/Mobile/*`，Toon Standard 写死不透明 → PC 版「透明雨衣透出袖子」不可移植，改为几何方案：
+  新对象 `Lapwing_B_Raincoat`（B 袖网格副本：肘以上收缩到 20% 并删深部、喇叭口下垂侧压到 0.65、接缝法线迁移自雨衣），由雨衣的 MA ObjectToggle 与原 B 互斥切换。
+- 验证手段：NDMF 克隆构建探针；不构建克隆上同步旋转所有 armature 的 `LowerArm_L` 做弯肘；射线露出指标（需 `queriesHitBackfaces`，命中=露出）。坑：弯曲方向写反、硬删面出锯齿、过渡卡在关节。
+- 材质：hair 系 matcap（sweetd1saster pack）对深色衣物用加法 0.35–0.6，fabric 系加法会洗白；Toon Standard rim 不受光照影响 → 霓虹描边；MinBrightness 0.03。发色菜单会覆盖头发材质（原全是 Toon Lit）。
+- 调过的资产存档在 `Assets/QuestTuned/LapwingBody FT combine min/`（MoveAsset 保 GUID，附 README）。完整规格在项目 skill `lapwing-hair-dissolve` 第 11 节。
+- Unity MCP 插件未注册时可 HTTP 直连 `127.0.0.1:8080/mcp`（streamable HTTP + mcp-session-id）。
 
 ## Assets 目录（顶层）
 

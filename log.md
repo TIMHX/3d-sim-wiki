@@ -156,3 +156,6 @@ tags: [meta]
 ## [2026-09-08] update | pullpop-cloud-particle-retrigger
 - 用户 Gesture Manager Play 模式实测通过：连续拉动云粒子每次都出，PhysBone 手感可用（后续自行微调 pull/spring/stiffness/链长）
 - 页面状态从「最终验证待补」改为「已验证成功」
+
+## [2026-09-28] update | lapwing-min-avatar-project
+- 新增「Quest 版 combine min (Android)：雨衣 × B 袖 + 夜店风材质」一节：Quest 不透明限制下的几何共存方案、验证方法与坑、matcap/rim 结论、QuestTuned 存档位置、MCP HTTP 直连
