@@ -1,7 +1,7 @@
 ---
 title: Lapwing-min Avatar Project (VRChat)
 created: 2026-08-16
-updated: 2026-09-28
+updated: 2026-09-29
 type: summary
 tags: [unity, vrchat, vrchat-avatar, asset-management]
 sources: []
@@ -99,6 +99,16 @@ Midnight 的 4 套衣服（BlackWhite/GreenWhite/Black/Brown）合并为单网�
 - 材质：hair 系 matcap（sweetd1saster pack）对深色衣物用加法 0.35–0.6，fabric 系加法会洗白；Toon Standard rim 不受光照影响 → 霓虹描边；MinBrightness 0.03。发色菜单会覆盖头发材质（原全是 Toon Lit）。
 - 调过的资产存档在 `Assets/QuestTuned/LapwingBody FT combine min/`（MoveAsset 保 GUID，附 README）。完整规格在项目 skill `lapwing-hair-dissolve` 第 11 节。
 - Unity MCP 插件未注册时可 HTTP 直连 `127.0.0.1:8080/mcp`（streamable HTTP + mcp-session-id）。
+
+## Quest 版三头像统一 + 10MB 下载墙（2026-09-29）
+
+- 头发：Midnight min (Android) 收入 HairPony / LowPonytail（带 PB）/ LpwPony，发色菜单每项 = MA ObjectToggle（切发型）+ MaterialSetter（切色），无动画层。主头发：combine=HairPony、Copy=LowPonytail，其余头发 PB 删除（Quest PB ≤ 8）。
+- 眼睛"游戏里很暗"：Toon Lit 在暗光被压黑、Toon Standard 皮肤不会 → 眼睛/瞳色原地转 Toon Standard + `_EmissionMap`=主贴图 0.35。
+- Cyber = 照搬 PC Midnight：关 outer×4/armbadge/belt、开雨衣。⚠️ 用户在 PC 版手调的是**雨衣骨架**（Chest/UpperArm/Hood/Visor 等 8 根）+ `Hood_Deform` 形态键 → 复刻衣服要逐骨 diff 拷贝，不能只对齐根物体。帽子 Visor 随雨衣一并搬（+1 PB）。
+- 减面：lilNDMFMeshSimplifier 组件（构建时生效，原 FBX 不动）；细饰边要开 PreserveBorderEdges/UVSeam。⚠️ 反射烘焙出的网格在编辑器 SMR 上渲染不出，验证只看 NDMF 构建克隆。
+- 下载体积：⚠️ **贴图才是杠杆**——网格原始 23.6MB 但 LZMA 压到约 1/5，ASTC 贴图几乎压不动。Avatar Compressor 预设 HighQuality→Quality：贴图 6.9→2.3MB（HighQuality 会跳过所有 512 图）；嫌糊的个别贴图用 `FrozenTextures` 单独冻结（Divisor 相对源图，1024 源要 512 设 2），inner 冻结后合计 2.89MB。原生 Iris 用 MaterialSetter 替代 MaterialSwap 以免 From 材质进包。
+- 精确体积探针：NDMF 克隆构建 → `EditorUtility.CollectDependencies` → 按 `Texture2D.format` 的 ASTC 块大小逐 mip 计算（`VRCExpressions* Icon.png` 是编辑器图标误报）。
+- 细节与脚本在项目 skill `lapwing-hair-dissolve` 第 12–12.12 节；资产存档 `Assets/QuestTuned/<avatar>/README.md`。
 
 ## Assets 目录（顶层）
 

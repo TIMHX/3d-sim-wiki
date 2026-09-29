@@ -159,3 +159,6 @@ tags: [meta]
 
 ## [2026-09-28] update | lapwing-min-avatar-project
 - 新增「Quest 版 combine min (Android)：雨衣 × B 袖 + 夜店风材质」一节：Quest 不透明限制下的几何共存方案、验证方法与坑、matcap/rim 结论、QuestTuned 存档位置、MCP HTTP 直连
+
+## [2026-09-29] update | lapwing-min-avatar-project
+- 新增「Quest 版三头像统一 + 10MB 下载墙」一节：发型/发色 MA 切换、眼睛变暗根因、Cyber 雨衣逐骨复刻、构建时减面、Avatar Compressor 预设与 FrozenTextures、精确体积探针
