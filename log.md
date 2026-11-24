@@ -162,3 +162,6 @@ tags: [meta]
 
 ## [2026-09-29] update | lapwing-min-avatar-project
 - 新增「Quest 版三头像统一 + 10MB 下载墙」一节：发型/发色 MA 切换、眼睛变暗根因、Cyber 雨衣逐骨复刻、构建时减面、Avatar Compressor 预设与 FrozenTextures、精确体积探针
+
+## [2026-11-24] create | vrchat-material-anim-slider-audit
+- Lapwing Glow & Color 滑杆在 PC 衣服上无效的全量审计：根因表、审计脚本要点、离线满节拍/手动属性块/洋红差分验证；附原生面捕 ApplyToBlendshape 把转发参数降到 20 冲 Good 评级

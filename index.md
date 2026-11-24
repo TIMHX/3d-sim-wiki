@@ -44,5 +44,6 @@ tags: [meta]
 
 ## Troubleshooting
 
+- [[vrchat-material-anim-slider-audit|材质动画滑杆无效的审计]] — AudioLink 强度/发光/主题色滑杆没用：跨平台属性、属性名错、封顶、rgb 清 alpha、Poi 未标 Animated、合并渲染器冲突、gamma 转换；附原生面捕转发参数冲 Good 评级
 - [[pullpop-cloud-particle-retrigger|PullPop 云粒子只触发一次]] — WD 不复位 `m_IsActive` 致粒子只播一次:根因、Effect Clip 脉冲修法、Play 模式污染场景的坑、Gesture Manager 反射读实时状态、PhysBone 自然拉动配方
 - [[blender-usd-subdiv-render-levels]] — USD 导出评估渲染级细分(视口 3/渲染 2 导致 4× 面数爆炸)
